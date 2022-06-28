@@ -6,18 +6,6 @@
     <br><br>
     <section class="p-5">
         <div class="container">
-          <div class="row text-center g-4">
-            <div class="col-md-3 mx-auto">
-              <div class="card text-bg-secondary text-light" id="script_box_color">
-                <div class="card-body text-center">
-                  <h4>Script:<button id="togglebtn0" type="button" class="btn btn-toggle" data-toggle="button" aria-pressed="false" autocomplete="off" onclick="toggleScriptStatus()">
-                  <div class="handle"></div>
-                  </button></h4>
-                </div>
-              </div>
-            </div>
-          </div>
-          <br>
           <div class="row text-center g-4" id="jobs_row">
             {% for job in rsi_db %}
             <div class="col-md" id="job{{job['job_no']}}">
