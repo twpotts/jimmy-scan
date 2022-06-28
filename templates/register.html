@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block page_title1 %}Register{% endblock %}
+
+{% block page_title2 %}Register{% endblock %}
+
+{% block form_data %}
+
+<form method="POST" action="">
+    {{ form.hidden_tag() }}<br><br>
+    {{ form.username() }}<br><br>
+    {{ form.password() }}<br><br>
+    {{ form.submit() }}<br><br>
+</form>
+
+{% endblock %}

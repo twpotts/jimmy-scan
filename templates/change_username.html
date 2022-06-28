@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block page_title1 %}Change Username{% endblock %}
+
+{% block page_title2 %}Change Username{% endblock %}
+
+{% block form_data %}
+
+<form method="POST" action="">
+    {{ form.hidden_tag() }}<br><br>
+    {{ form.username() }}<br><br>
+    {{ form.new_username() }}<br><br>
+    {{ form.password() }}<br><br>
+    {{ form.submit() }}<br><br>
+</form>
+<a href='/change_password'>Change Password</a>
+{% endblock %}
