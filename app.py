@@ -116,23 +116,21 @@ with open("tickers_dict.txt", "r") as file:
     tickers_dict = dict(zip(tickers, companies))
     file.close()
 
-# Create a route for the app: Whatever follows the slash how you access that page (rsi-bot-vv.herokuapp.com/)
+# Create a route for the app: Whatever follows the slash how you access that page (jimmy-scan.herokuapp.com/)
 
 @app.route('/', methods=["GET", "POST"])
 @login_required
 def home():    
 
+    if request.method == "POST":
+        scan = request.form.to_dict()
+        periods_unit = str(scan['periods_unit'])
+        periods_back = int(scan['periods_back'])
+
     # Pass that data to the HTML front-end
 
     return render_template('home.html', heroku_api = config.heroku_api, heroku_name = config.heroku_name, 
                             current_user = current_user, tickers_dict = tickers_dict)
-
-# Create scan function for home page
-@app.route('/scan', methods=["GET", "POST"])
-def scan():
-    if request.method == "POST":
-        x = 5
-    return render_template("home.html")
 
 # Create positions page
 

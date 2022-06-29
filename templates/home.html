@@ -5,1016 +5,176 @@
     <!-- Cards start -->
     <br><br>
     <section class="p-5">
-        <div class="container">
-          <div class="row text-center g-4" id="jobs_row">
-            {% for job in rsi_db %}
-            <div class="col-md" id="job{{job['job_no']}}">
-              <div class="card text-bg-secondary text-light" id="job_box_color{{job['job_no']}}">
-                <div class="card-body text-center">
-                  <span class="pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16" onclick="addJob()">
-                      <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                    </svg>
-                  </span>
-                  <button id="toggle_btn{{job['job_no']}}" type="button" class="btn btn-toggle" data-toggle="button" aria-pressed="false" autocomplete="off" onclick="changeJobActive({{job['job_no']}})">
-                  <div class="handle"></div>
-                  </button>
-                  {% if job['job_no'] != 1 %}
-                  <button type="button" class="btn-close pull-right" aria-label="Close" onclick="deleteJob({{job['job_no']}})"></button>
-                  {% endif %}
-                  <h3 class="card-title mb-3">Job {{job['job_no']}}</h3>
-                  <p class="card-text">
-                    <table class="table">
-                        <thead></thead>
-                        <tbody>
-                            <tr>
-                                <td>Stock:</td>
-                                <td id="rsi_ticker{{job['job_no']}}">{{job['rsi_ticker']}}</td>
-                            </tr>
-                            <tr>
-                                <td>Number of shares:</td>
-                                <td id="size{{job['job_no']}}">{{job['size']}}</td>
-                            </tr>
-                            <tr>
-                                <td>Buying RSI Range:</td>
-                                <td id="rsi_low_value{{job['job_no']}}">{{job['rsi_low_value']}}</td>
-                            </tr>
-                            <tr>
-                                <td>Selling RSI Range:</td>
-                                <td id="rsi_high_value{{job['job_no']}}">{{job['rsi_high_value']}}</td>
-                            </tr>
-                            <tr>
-                                <td>RSI Window:</td>
-                                <td id="rsi_window{{job['job_no']}}">{{job['rsi_window']}}</td>
-                            </tr>
-                            <tr>
-                                <td>Number of times:</td>
-                                <td id="times{{job['job_no']}}">{{job['times']}}</td>
-                            </tr>
-                            <tr>
-                                <td>Timeframe:</td>
-                                <td id="rsi_timeframe_unit{{job['job_no']}}">{{job['rsi_timeframe_unit']}}</td>
-                            </tr>
-                            <tr>
-                                <td>Min profit:</td>
-                                <td id="min_profit{{job['job_no']}}">{{job['min_profit']}}</td>
-                            </tr>
-                            <tr>
-                                <td>Max profit:</td>
-                                <td id="max_profit{{job['job_no']}}">{{job['max_profit']}}</td>
-                            </tr>
-                            <tr>
-                                <td>Max loss:</td>
-                                <td id="max_loss{{job['job_no']}}">{{job['max_loss']}}</td>
-                            </tr>
-                            <tr>
-                                <td>Long/short:</td>
-                                <td id="longshort{{job['job_no']}}">{{job['longshort']}}</td>
-                            </tr>
-                        </tbody>
-                        </table>
-                  </p>
-                  <button class="btn btn-dark" onclick="editJob({{job['job_no']}})" id="edit{{job['job_no']}}">Edit</button>
+      <div class="container">
+        <div class="row" id="row1">
+          <div class="col" id="col1">
+            <h3>Jimmy Scan&nbsp;<button class="viz_submit" onclick="clearInputs()">Clear</button></h3>
+          </div>
+        </div>
+        <form action="/" method="POST">
+          <div class="row" id="row2">
+            <div class="col" id="col2">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Periods Back</th>
+                    <th>Period Unit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><input id="periods_back" name="periods_back"></td>
+                    <td>
+                      <select id="periods_unit" name="periods_unit">
+                        <option></option>
+                        <option value="daily">daily</option>
+                        <option value="weekly">weekly</option>
+                        <option value="monthly">monthly</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="row" id="row3">
+            <div class="col" id="col3">
+              <input class="viz_submit" type="Submit" onclick="storeInputs()">
+            </div>
+          </div>
+        </form>
+        <div class="row" id="row4">
+          <div class="col" id="col4">
+            <div id="progress_header">
+              Symbols 0 / 200 (0 %)
+              <div class="progress-grid__container">
+                <div class="progress-bar__container">
+                  <div class="progress-bar">
+                    <span class="progress-bar__text">Screener finished, paused</span>
+                  </div>
                 </div>
               </div>
             </div>
-            {% endfor %}
           </div>
         </div>
-      </section>
+        <div class="row" id="row5">
+          <div class="col" id="col5">
+            <button id="btnExportToCsv" type="button" class="button">Export to CSV</button>&emsp;&emsp;</h3>
+          </div>
+        </div>
+      </div>
+    </section>
     <!-- Cards end -->
     <style>
       body {
         background-color: gainsboro;
       }
-      .example {
-        margin: 4rem auto;
-      }
-      .example > .btn-toggle {
-        top: 50%;
-        transform: translateY(-50%);
-      }
-      .btn-toggle {
-        margin: 0 4rem;
-        padding: 0;
-        position: relative;
-        border: none;
-        height: 1.5rem;
-        width: 3rem;
-        border-radius: 1.5rem;
-        color: #d2dff2;
-        background: #bdc1c8;
-      }
-      .btn-toggle:focus, .btn-toggle:focus.active, .btn-toggle.focus, .btn-toggle.focus.active {
-        outline: none;
-      }
-      .btn-toggle:before, .btn-toggle:after {
-        line-height: 1.5rem;
-        width: 4rem;
-        text-align: center;
-        font-weight: 600;
-        font-size: .75rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        position: absolute;
-        bottom: 0;
-        transition: opacity .25s;
-      }
-      .btn-toggle:before {
-        content: 'Off';
-        left: -4rem;
-      }
-      .btn-toggle:after {
-        content: 'On';
-        right: -4rem;
-        opacity: .5;
-      }
-      .btn-toggle > .handle {
-        position: absolute;
-        top: 0.1875rem;
-        left: 0.1875rem;
-        width: 1.125rem;
-        height: 1.125rem;
-        border-radius: 1.125rem;
-        background: #fff;
-        transition: left .25s;
-      }
-      .btn-toggle.active {
-        transition: background-color .25s;
-      }
-      .btn-toggle.active > .handle {
-        left: 1.6875rem;
-        transition: left .25s;
-      }
-      .btn-toggle.active:before {
-        opacity: .5;
-      }
-      .btn-toggle.active:after {
-        opacity: 1;
-      }
-      .btn-toggle:before, .btn-toggle:after {
-        color: #ebf2ff;
-      }
-      .btn-toggle.active {
-        background-color: #29b5a8;
-      }
       .pointer {
         cursor: pointer;
+      }
+      #progress_header {
+        width: 100%;
+        text-align: left;
+        padding: 5px;
+      }
+      .progress-grid__container {
+        display: flex;
+        justify-content: left;
+        align-items: left;
+        height: 100%;
+        width: 100%;
+        padding: 5px;
+      }
+      .progress-bar__container {
+        width: 70%;
+        height: 2rem;
+        border-radius: 2rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.5s;
+        will-change: transform;
+        box-shadow: 0 0 5px #008516;
+      }
+      .progress-bar {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        content: "";
+        background-color: #008516;
+        top:0;
+        bottom: 0;
+        left: -100%;
+        border-radius: inherit;
+        display: flex;
+        justify-content: center;
+        align-items:center;
+        color: white;
+        font-family: sans-serif;
+      }
+      .progress-bar__text {
+        display: none;
+      }
+      .viz_submit {
+        margin-top: 1vmax;
+        border: 1px solid #55acee;
+        outline: none;
+        background-color: #55acee;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .viz_submit:hover {
+        background-color: white;
+        color: #55acee
       }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-database.js"></script>
     <script>
 
-"use strict";
-      let autocomplete = (inp, arr) => {
-        /*the autocomplete function takes two arguments,
-        the text field element and an array of possible autocompleted values:*/
-        let currentFocus;
-        /*execute a function when someone writes in the text field:*/
-        inp.addEventListener("input", function(e) {
-          let a, //OUTER html: variable for listed content with html-content
-            b, // INNER html: filled with array-Data and html
-            i, //Counter
-            val = this.value;
-      
-          /*close any already open lists of autocompleted values*/
-          closeAllLists();
-      
-          if (!val) {
-            return false;
-          }
-      
-          currentFocus = -1;
-      
-          /*create a DIV element that will contain the items (values):*/
-          a = document.createElement("DIV");
-          
-          a.setAttribute("id", this.id + "autocomplete-list");
-          a.setAttribute("class", "autocomplete-items list-group text-left");
-          
-          /*append the DIV element as a child of the autocomplete container:*/
-          this.parentNode.appendChild(a);
-      
-          /*for each item in the array...*/
-          for (i = 0; i < arr.length; i++) {
-            /*check if the item starts with the same letters as the text field value:*/
-            if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase() || arr[i].split(' | ')[1].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
-              /*create a DIV element for each matching element:*/
-              b = document.createElement("DIV");
-              b.setAttribute("class","list-group-item list-group-item-action");
-              /*make the matching letters bold:*/
-              if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
-                b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
-                b.innerHTML += arr[i].substr(val.length);
-              } else if (arr[i].split(' | ')[1].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
-                b.innerHTML = arr[i].split(' | ')[0] + ' | ' + "<strong>" + arr[i].split(' | ')[1].substring(0, val.length) + "</strong>";
-                b.innerHTML += arr[i].split(' | ')[1].substr(val.length);
-              }
-              /*insert a input field that will hold the current array item's value:*/
-              b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
-              /*execute a function when someone clicks on the item value (DIV element):*/
-              b.addEventListener("click", function(e) {
-                /*insert the value for the autocomplete text field:*/
-                inp.value = this.getElementsByTagName("input")[0].value.split(' | ')[0];
-                /*close the list of autocompleted values,
-                    (or any other open lists of autocompleted values:*/
-                closeAllLists();
-              });
-              a.appendChild(b);
-            }
-          }
-        });
-
-        /*execute a function presses a key on the keyboard:*/
-        inp.addEventListener("keydown", function(e) {
-          var x = document.getElementById(this.id + "autocomplete-list");
-          if (x) x = x.getElementsByTagName("div");
-          if (e.keyCode == 40) {
-            /*If the arrow DOWN key is pressed,
-              increase the currentFocus variable:*/
-            currentFocus++;
-            /*and and make the current item more visible:*/
-            addActive(x);
-          } else if (e.keyCode == 38) {
-            //up
-            /*If the arrow UP key is pressed,
-              decrease the currentFocus variable:*/
-            currentFocus--;
-            /*and and make the current item more visible:*/
-            addActive(x);
-          } else if (e.keyCode == 13) {
-            /*If the ENTER key is pressed, prevent the form from being submitted,*/
-            e.preventDefault();
-            if (currentFocus > -1) {
-              /*and simulate a click on the "active" item:*/
-              if (x) x[currentFocus].click();
-            }
-          }
-        });
-        
-        let addActive = (x) => {
-          /*a function to classify an item as "active":*/
-          if (!x) return false;
-          /*start by removing the "active" class on all items:*/
-          removeActive(x);
-          if (currentFocus >= x.length) currentFocus = 0;
-          if (currentFocus < 0) currentFocus = x.length - 1;
-          /*add class "autocomplete-active":*/
-          x[currentFocus].classList.add("active");
-        }
-        
-        let removeActive = (x) => {
-          /*a function to remove the "active" class from all autocomplete items:*/
-          for (let i = 0; i < x.length; i++) {
-            x[i].classList.remove("active");
+    const btnExportToCsv = document.getElementById("btnExportToCsv");
+    btnExportToCsv.addEventListener("click", () => {
+        let indexTable = document.getElementById("index_table1");
+        let indexTableHead = indexTable.getElementsByTagName("thead")[0]
+        let indexTableBody = indexTable.getElementsByTagName("tbody")[0]
+        var tableRows = indexTable.getElementsByTagName('tr');
+        var rowCount = tableRows.length;
+        for (var x=rowCount-1; x>0; x--) {
+          if (tableRows[x].style.display == "none") {
+            indexTable.children[1].removeChild(tableRows[x]);
           }
         }
-        
-        let closeAllLists = (elmnt) => {
-          /*close all autocomplete lists in the document,
-          except the one passed as an argument:*/
-          var x = document.getElementsByClassName("autocomplete-items");
-          for (var i = 0; i < x.length; i++) {
-            if (elmnt != x[i] && elmnt != inp) {
-              x[i].parentNode.removeChild(x[i]);
-            }
-          }
-        }
-        
-        /*execute a function when someone clicks in the document:*/
-        document.addEventListener("click", function(e) {
-          closeAllLists(e.target);
-        });
-        
-      };
-      
-      /*An array containing all the country names in the world:*/
-      let ticker_dict = {{tickers_dict|safe}}
-      let tickers = Object.keys(ticker_dict)
-      let companies_the = Object.values(ticker_dict)
-      let companies = []
-      let i = 0
-      while(i < companies_the.length) {
-        if(companies_the[i].substr(0,4) == 'The ') {
-          companies.push(companies_the[i].substr(4))
-        } else {
-          companies.push(companies_the[i])
-        }
-        i++
-      }
-      let ticker_companies = []
-      let j = 0
-      while(j < tickers.length) {
-        ticker_companies.push(tickers[j] + " | " + companies[j])
-        j++
-      }
-      
-      /*initiate the autocomplete function on the "ticker" element, and pass along the tickers array as possible autocomplete values:*/
-      //autocomplete(document.getElementById("ticker"), ticker_companies);
-      /**
-       * CREATES OUTPUT LIKE THIS:
-       *
-       * <div id="tickerautocomplete-list" class="autocomplete-items">
-       *    <div>
-       *       <strong>A</strong>fghanistan<input value="Afghanistan" type="hidden">
-       *    </div>
-       *    <div><strong>A</strong>lbania<input value="Albania" type="hidden"></div>
-       *    <div><strong>A</strong>zerbaijan<input value="Azerbaijan" type="hidden"></div>
-       *    ...
-       *    ...
-       *    ...
-       * </div>
-       */
+        const exporter = new TableCSVExporter(indexTable);
+        const csvOutput = exporter.convertToCSV();
+        const csvBlob = new Blob([csvOutput], { type: "text/csv" });
+        const blobUrl = URL.createObjectURL(csvBlob);
+        const anchorElement = document.createElement("a");
+        anchorElement.href = blobUrl;
+        anchorElement.download = "table-export.csv";
+        anchorElement.click();
+        setTimeout(() => {
+            URL.revokeObjectURL(blobUrl);
+        }, 500);
+    });
 
-        function ConnectFire() {
-            const firebaseConfig = {{db_config | safe}};
-            if (firebase.apps.length === 0) {
-                firebase.initializeApp(firebaseConfig);
-                return true
-            } else {
-                return false
-            }
-          }
+    function storeInputs() {
+      localStorage.setItem("periods_back", document.getElementById("periods_back").value);
+      localStorage.setItem("periods_unit", document.getElementById("periods_unit").value);
+    }
 
-        function editJob(nbr) {
-            let rsi_ticker = document.getElementById(`rsi_ticker${nbr}`)
-            let size = document.getElementById(`size${nbr}`)
-            let rsi_low_value = document.getElementById(`rsi_low_value${nbr}`)
-            let rsi_high_value = document.getElementById(`rsi_high_value${nbr}`)
-            let rsi_window = document.getElementById(`rsi_window${nbr}`)
-            let times = document.getElementById(`times${nbr}`)
-            let rsi_timeframe_unit = document.getElementById(`rsi_timeframe_unit${nbr}`)
-            let min_profit = document.getElementById(`min_profit${nbr}`)
-            let max_profit = document.getElementById(`max_profit${nbr}`)
-            let max_loss = document.getElementById(`max_loss${nbr}`)
-            let longshort = document.getElementById(`longshort${nbr}`)
-            
-            let input1 = document.createElement("input")
-            input1.value = rsi_ticker.textContent
-            rsi_ticker.parentElement.appendChild(input1)
-            rsi_ticker.parentElement.removeChild(rsi_ticker)
-            input1.id = `rsi_ticker${nbr}_input`
-            autocomplete(document.getElementById(`rsi_ticker${nbr}_input`), ticker_companies);
+    function clearInputs() {
+      document.getElementById("periods_back").value = '';
+      document.getElementById("periods_unit").value = '';
+    }
 
-            let input2 = document.createElement("input")
-            input2.value = size.textContent
-            size.parentElement.appendChild(input2)
-            size.parentElement.removeChild(size)
-            input2.id = `size${nbr}_input`
-            
-            let input3 = document.createElement("input")
-            input3.value = rsi_low_value.textContent
-            rsi_low_value.parentElement.appendChild(input3)
-            rsi_low_value.parentElement.removeChild(rsi_low_value)
-            input3.id = `rsi_low_value${nbr}_input`
-            
-            let input4 = document.createElement("input")
-            input4.value = rsi_high_value.textContent
-            rsi_high_value.parentElement.appendChild(input4)
-            rsi_high_value.parentElement.removeChild(rsi_high_value)
-            input4.id = `rsi_high_value${nbr}_input`
-            
-            let input5 = document.createElement("input")
-            input5.value = rsi_window.textContent
-            rsi_window.parentElement.appendChild(input5)
-            rsi_window.parentElement.removeChild(rsi_window)
-            input5.id = `rsi_window${nbr}_input`
+    function displayInputs() {
+      document.getElementById("periods_back").value = localStorage.getItem("periods_back");
+      document.getElementById("periods_unit").value = localStorage.getItem("periods_unit");
+    }
 
-            let input6 = document.createElement("input")
-            input6.value = times.textContent
-            times.parentElement.appendChild(input6)
-            times.parentElement.removeChild(times)
-            input6.id = `times${nbr}_input`
-
-            let input7 = document.createElement("select")
-            let input7a = document.createElement("option")
-            input7a.value = "minute"
-            input7a.textContent = "minute"
-            let input7b = document.createElement("option")
-            input7b.value = "daily"
-            input7b.textContent = "daily"
-            let input7c = document.createElement("option")
-            input7c.value = "weekly"
-            input7c.textContent = "weekly"
-            let input7d = document.createElement("option")
-            input7d.value = "monthly"
-            input7d.textContent = "monthly"
-            input7.appendChild(input7a)
-            input7.appendChild(input7b)
-            input7.appendChild(input7c)
-            input7.appendChild(input7d)
-            rsi_timeframe_unit.parentElement.appendChild(input7)
-            rsi_timeframe_unit.parentElement.removeChild(rsi_timeframe_unit)
-            input7.id = `rsi_timeframe_unit${nbr}_input`
-
-            let input8 = document.createElement("input")
-            input8.value = min_profit.textContent
-            min_profit.parentElement.appendChild(input8)
-            min_profit.parentElement.removeChild(min_profit)
-            input8.id = `min_profit${nbr}_input`
-
-            let input9 = document.createElement("input")
-            input9.value = max_profit.textContent
-            max_profit.parentElement.appendChild(input9)
-            max_profit.parentElement.removeChild(max_profit)
-            input9.id = `max_profit${nbr}_input`
-
-            let input10 = document.createElement("input")
-            input10.value = max_loss.textContent
-            max_loss.parentElement.appendChild(input10)
-            max_loss.parentElement.removeChild(max_loss)
-            input10.id = `max_loss${nbr}_input`
-
-            let input11 = document.createElement("select")
-            let input11a = document.createElement("option")
-            input11a.value = "LONG"
-            input11a.textContent = "LONG"
-            let input11b = document.createElement("option")
-            input11b.value = "SHORT"
-            input11b.textContent = "SHORT"
-            input11.appendChild(input11a)
-            input11.appendChild(input11b)
-            longshort.parentElement.appendChild(input11)
-            longshort.parentElement.removeChild(longshort)
-            input11.id = `longshort${nbr}_input`
-
-            let edit_btn = document.getElementById(`edit${nbr}`)
-            let submit_btn = document.createElement("button")
-            submit_btn.innerHTML = "Submit"
-            submit_btn.className = "btn btn-primary"
-            submit_btn.id = `submit${nbr}`
-            submit_btn.onclick = function() {submitJob(nbr)}
-            edit_btn.parentElement.appendChild(submit_btn)
-            edit_btn.parentElement.removeChild(edit_btn)
-        }
-
-        function submitJob(nbr) {
-            let rsi_ticker_input = document.getElementById(`rsi_ticker${nbr}_input`)
-            let size_input = document.getElementById(`size${nbr}_input`)
-            let rsi_low_value_input = document.getElementById(`rsi_low_value${nbr}_input`)
-            let rsi_high_value_input = document.getElementById(`rsi_high_value${nbr}_input`)
-            let rsi_window_input = document.getElementById(`rsi_window${nbr}_input`)
-            let times_input = document.getElementById(`times${nbr}_input`)
-            let rsi_timeframe_unit_input = document.getElementById(`rsi_timeframe_unit${nbr}_input`)
-            let min_profit_input = document.getElementById(`min_profit${nbr}_input`)
-            let max_profit_input = document.getElementById(`max_profit${nbr}_input`)
-            let max_loss_input = document.getElementById(`max_loss${nbr}_input`)
-            let longshort_input = document.getElementById(`longshort${nbr}_input`)
-
-            let rsi_ticker_td = document.createElement("td")
-            let size_td = document.createElement("td")
-            let rsi_low_value_td = document.createElement("td")
-            let rsi_high_value_td = document.createElement("td")
-            let rsi_window_td = document.createElement("td")
-            let times_td = document.createElement("td")
-            let rsi_timeframe_unit_td = document.createElement("td")
-            let min_profit_td = document.createElement("td")
-            let max_profit_td = document.createElement("td")
-            let max_loss_td = document.createElement("td")
-            let longshort_td = document.createElement("td")
-
-            rsi_ticker_td.id = `rsi_ticker${nbr}`
-            size_td.id = `size${nbr}`
-            rsi_low_value_td.id = `rsi_low_value${nbr}`
-            rsi_high_value_td.id = `rsi_high_value${nbr}`
-            rsi_window_td.id = `rsi_window${nbr}`
-            times_td.id = `times${nbr}`
-            rsi_timeframe_unit_td.id = `rsi_timeframe_unit${nbr}`
-            min_profit_td.id = `min_profit${nbr}`
-            max_profit_td.id = `max_profit${nbr}`
-            max_loss_td.id = `max_loss${nbr}`
-            longshort_td.id = `longshort${nbr}`
-
-            rsi_ticker_td.textContent = rsi_ticker_input.value
-            size_td.textContent = size_input.value
-            rsi_low_value_td.textContent = rsi_low_value_input.value
-            rsi_high_value_td.textContent = rsi_high_value_input.value
-            rsi_window_td.textContent = rsi_window_input.value
-            times_td.textContent = times_input.value
-            rsi_timeframe_unit_td.textContent = rsi_timeframe_unit_input.value
-            min_profit_td.textContent = min_profit_input.value
-            max_profit_td.textContent = max_profit_input.value
-            max_loss_td.textContent = max_loss_input.value
-            longshort_td.textContent = longshort_input.value
-
-            rsi_ticker_input.parentElement.appendChild(rsi_ticker_td)
-            size_input.parentElement.appendChild(size_td)
-            rsi_low_value_input.parentElement.appendChild(rsi_low_value_td)
-            rsi_high_value_input.parentElement.appendChild(rsi_high_value_td)
-            rsi_window_input.parentElement.appendChild(rsi_window_td)
-            times_input.parentElement.appendChild(times_td)
-            rsi_timeframe_unit_input.parentElement.appendChild(rsi_timeframe_unit_td)
-            min_profit_input.parentElement.appendChild(min_profit_td)
-            max_profit_input.parentElement.appendChild(max_profit_td)
-            max_loss_input.parentElement.appendChild(max_loss_td)
-            longshort_input.parentElement.appendChild(longshort_td)
-
-            rsi_ticker_input.parentElement.removeChild(rsi_ticker_input)
-            size_input.parentElement.removeChild(size_input)
-            rsi_low_value_input.parentElement.removeChild(rsi_low_value_input)
-            rsi_high_value_input.parentElement.removeChild(rsi_high_value_input)
-            rsi_window_input.parentElement.removeChild(rsi_window_input)
-            times_input.parentElement.removeChild(times_input)
-            rsi_timeframe_unit_input.parentElement.removeChild(rsi_timeframe_unit_input)
-            min_profit_input.parentElement.removeChild(min_profit_input)
-            max_profit_input.parentElement.removeChild(max_profit_input)
-            max_loss_input.parentElement.removeChild(max_loss_input)
-            longshort_input.parentElement.removeChild(longshort_input)
-
-            let edit_btn_new = document.createElement("button")
-            edit_btn_new.className = "btn btn-dark"
-            edit_btn_new.id = `edit${nbr}`
-            edit_btn_new.textContent = "Edit"
-            edit_btn_new.onclick = function() {editJob(nbr)}
-
-            let submit_btn = document.getElementById(`submit${nbr}`)
-            submit_btn.parentElement.appendChild(edit_btn_new)
-            submit_btn.parentElement.removeChild(submit_btn)
-
-            let json_all = {
-              "rsi_ticker": String(rsi_ticker_input.value).toUpperCase(),
-              "size": parseInt(size_input.value),
-              "rsi_low_value": parseFloat(rsi_low_value_input.value),
-              "rsi_high_value": parseFloat(rsi_high_value_input.value),
-              "rsi_window": parseInt(rsi_window_input.value),
-              "times": parseInt(times_input.value),
-              "rsi_timeframe_unit": String(rsi_timeframe_unit_input.value).toLowerCase(),
-              "min_profit": parseFloat(min_profit_input.value),
-              "max_profit": parseFloat(max_profit_input.value),
-              "max_loss": parseFloat(max_loss_input.value),
-              "longshort": String(longshort_input.value).toUpperCase()
-            }
-
-            ConnectFire()
-            firebase.database().ref(`rsi_settings/job_${nbr}`).on("value", function(snapshot) {
-              let rsi_ticker_db = snapshot.val().rsi_ticker
-              let status = snapshot.val().status
-              if (rsi_ticker_db != json_all['rsi_ticker']) {
-                json_all['status'] = "Out"
-              } else {
-                json_all['status'] = status
-              }
-            })
-            console.log(json_all)
-            firebase.database().ref(`rsi_settings/job_${nbr}`).update(json_all)
-        }
-
-        function getJobActive() {
-          ConnectFire()
-          let toggle_btns = document.querySelectorAll('[id^="toggle_btn"]')
-          let job_box_colors = document.querySelectorAll('[id^="job_box_color"]')
-          let i = 0
-          toggle_btns.forEach(btn => {
-            i++
-            firebase.database().ref(`rsi_settings/job_${i}`).on("value", function(snapshot) {
-              let active = snapshot.val().active
-              if (active == true) {
-                btn.setAttribute("aria-pressed", "true")
-                btn.classList.add("active")
-              } else if (active == false) {
-                btn.setAttribute("aria-pressed", "false")
-                btn.classList.remove("active")
-              }
-            })
-          })
-          let j = 0;
-          job_box_colors.forEach(box => {
-            j++
-            firebase.database().ref(`rsi_settings/job_${j}`).on("value", function(snapshot) {
-              let active = snapshot.val().active
-              if (active == true) {
-                box.className = "card text-bg-success text-light"
-              } else if (active == false) {
-                box.className = "card text-bg-secondary text-light"
-              }
-            })
-          })
-          setTimeout(getJobActive, 2000)
-        }
-
-        getJobActive()
-
-        function changeJobActive(nbr) {
-          let toggle_btn = document.getElementById(`toggle_btn${nbr}`)
-          let btn_pressed = JSON.parse(toggle_btn.getAttribute("aria-pressed"))
-          let json_new = {"active": !btn_pressed}
-          ConnectFire()
-          firebase.database().ref(`rsi_settings/job_${nbr}`).update(json_new)
-          let job_box_color = document.getElementById(`job_box_color${nbr}`)
-          if (!btn_pressed) {
-            job_box_color.className = "card text-bg-success text-light"
-          } else {
-            job_box_color.className = "card text-bg-secondary text-light"
-          }
-        }
-
-        function deleteJob(nbr) {
-          let job = document.getElementById(`job${nbr}`)
-          job.parentNode.removeChild(job)
-          let nbr_jobs = document.querySelectorAll('[id^="toggle_btn"]').length
-          let json_jobs = {"nbr_jobs": nbr_jobs}
-          ConnectFire()
-          firebase.database().ref(`rsi_settings/job_${nbr}`).set({})
-          firebase.database().ref("rsi_settings/info").update(json_jobs)
-        }
-
-        function addJob() {
-          let jobs_row = document.getElementById("jobs_row")
-          let job_col = document.createElement("div")
-          let h3s = document.querySelectorAll("h3")
-          let jobs_nbr = document.querySelectorAll('[id^="toggle_btn"]').length
-          let jobs_list = []
-          let n = 0
-          while (n < h3s.length) {
-            let job_no = parseInt(h3s[n].textContent.split("Job ")[1])
-            jobs_list.push(job_no)
-            n++
-          }
-          let new_job_nbr = jobs_nbr + 1
-          let m = 0
-          while (m < jobs_list.length - 1) {
-            if (jobs_list[m] + 1 != jobs_list[m+1]) {
-              new_job_nbr = jobs_list[m] + 1
-            }
-            m++
-          }
-          job_col.className = "col-md"
-          job_col.id = `job${new_job_nbr}`
-          let job_card = document.createElement("div")
-          job_card.className = "card text-bg-secondary text-light"
-          job_card.id = `job_box_color${new_job_nbr}`
-          let card_body = document.createElement("div")
-          card_body.className = "card-body text-center"
-          let pointer = document.createElement("span")
-          pointer.className = "pointer"
-          let plus_icon = document.createElement("svg")
-          plus_icon.setAttribute("xmlns", "http://www.w3.org/2000/svg")
-          plus_icon.setAttribute("width", "32")
-          plus_icon.setAttribute("height", "32")
-          plus_icon.setAttribute("fill", "currentColor")
-          plus_icon.setAttribute("viewBox", "0 0 16 16")
-          plus_icon.className = "bi bi-plus"
-          plus_icon.setAttribute("onclick", "addJob()")
-          let icon_path = document.createElement("path")
-          icon_path.setAttribute("d", "M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z")
-          let toggle_btn = document.createElement("button")
-          toggle_btn.id = `toggle_btn${new_job_nbr}`
-          toggle_btn.type = "button"
-          toggle_btn.className = "btn btn-toggle"
-          toggle_btn.setAttribute("data-toggle", "button")
-          toggle_btn.setAttribute("aria-pressed", false)
-          toggle_btn.autocomplete = "off"
-          toggle_btn.onclick = function() {changeJobActive(new_job_nbr)}
-          let handle = document.createElement("div")
-          handle.className = "handle"
-          let close_btn = document.createElement("button")
-          close_btn.type = "button"
-          close_btn.className = "btn-close pull-right"
-          close_btn.setAttribute("aria-label", "Close")
-          close_btn.onclick = function() {deleteJob(new_job_nbr)}
-          let card_title = document.createElement("h3")
-          card_title.className = "card-title mb-3"
-          card_title.textContent = `Job ${new_job_nbr}`
-          let card_text = document.createElement("p")
-          card_text.className = "card-text"
-
-          let job_table = document.createElement("table")
-          job_table.className = "table"
-          let table_head = document.createElement("thead")
-          let table_body = document.createElement("tbody")
-          let row1 = document.createElement("tr")
-          let r1d1 = document.createElement("td")
-          r1d1.textContent = "Stock:"
-          let r1d2 = document.createElement("td")
-          r1d2.id = `rsi_ticker${new_job_nbr}`
-          r1d2.textContent = "MSFT"
-          let row2 = document.createElement("tr")
-          let r2d1 = document.createElement("td")
-          r2d1.textContent = "Number of shares:"
-          let r2d2 = document.createElement("td")
-          r2d2.id = `size${new_job_nbr}`
-          r2d2.textContent = "25"
-          let row3 = document.createElement("tr")
-          let r3d1 = document.createElement("td")
-          r3d1.textContent = "Buying RSI Range:"
-          let r3d2 = document.createElement("td")
-          r3d2.id = `rsi_low_value${new_job_nbr}`
-          r3d2.textContent = "15"
-          let row4 = document.createElement("tr")
-          let r4d1 = document.createElement("td")
-          r4d1.textContent = "Selling RSI Range:"
-          let r4d2 = document.createElement("td")
-          r4d2.id = `rsi_high_value${new_job_nbr}`
-          r4d2.textContent = "85"
-          let row5 = document.createElement("tr")
-          let r5d1 = document.createElement("td")
-          r5d1.textContent = "RSI Window:"
-          let r5d2 = document.createElement("td")
-          r5d2.id = `rsi_window${new_job_nbr}`
-          r5d2.textContent = "14"
-          let row6 = document.createElement("tr")
-          let r6d1 = document.createElement("td")
-          r6d1.textContent = "Number of times:"
-          let r6d2 = document.createElement("td")
-          r6d2.id = `times${new_job_nbr}`
-          r6d2.textContent = "1"
-          let row7 = document.createElement("tr")
-          let r7d1 = document.createElement("td")
-          r7d1.textContent = "Timeframe:"
-          let r7d2 = document.createElement("td")
-          r7d2.id = `rsi_timeframe_unit${new_job_nbr}`
-          r7d2.textContent = "minute"
-          let row8 = document.createElement("tr")
-          let r8d1 = document.createElement("td")
-          r8d1.textContent = "Min profit:"
-          let r8d2 = document.createElement("td")
-          r8d2.id = `min_profit${new_job_nbr}`
-          r8d2.textContent = "0.1"
-          let row9 = document.createElement("tr")
-          let r9d1 = document.createElement("td")
-          r9d1.textContent = "Max profit:"
-          let r9d2 = document.createElement("td")
-          r9d2.id = `max_profit${new_job_nbr}`
-          r9d2.textContent = "40"
-          let row10 = document.createElement("tr")
-          let r10d1 = document.createElement("td")
-          r10d1.textContent = "Max loss:"
-          let r10d2 = document.createElement("td")
-          r10d2.id = `max_loss${new_job_nbr}`
-          r10d2.textContent = "0.4"
-          let row11 = document.createElement("tr")
-          let r11d1 = document.createElement("td")
-          r11d1.textContent = "Long/short"
-          let r11d2 = document.createElement("td")
-          r11d2.id = `longshort${new_job_nbr}`
-          r11d2.textContent = "LONG"
-
-          let edit_btn = document.createElement("button")
-          edit_btn.id = `edit${new_job_nbr}`
-          edit_btn.className = "btn btn-dark"
-          edit_btn.textContent = "Edit"
-          edit_btn.onclick = function() {editJob(new_job_nbr)}
-
-          job_table.appendChild(table_head)
-          row1.appendChild(r1d1)
-          row1.appendChild(r1d2)
-          row2.appendChild(r2d1)
-          row2.appendChild(r2d2)
-          row3.appendChild(r3d1)
-          row3.appendChild(r3d2)
-          row4.appendChild(r4d1)
-          row4.appendChild(r4d2)
-          row5.appendChild(r5d1)
-          row5.appendChild(r5d2)
-          row6.appendChild(r6d1)
-          row6.appendChild(r6d2)
-          row7.appendChild(r7d1)
-          row7.appendChild(r7d2)
-          row8.appendChild(r8d1)
-          row8.appendChild(r8d2)
-          row9.appendChild(r9d1)
-          row9.appendChild(r9d2)
-          row10.appendChild(r10d1)
-          row10.appendChild(r10d2)
-          row11.appendChild(r11d1)
-          row11.appendChild(r11d2)
-          table_body.appendChild(row1)
-          table_body.appendChild(row2)
-          table_body.appendChild(row3)
-          table_body.appendChild(row4)
-          table_body.appendChild(row5)
-          table_body.appendChild(row6)
-          table_body.appendChild(row7)
-          table_body.appendChild(row8)
-          table_body.appendChild(row9)
-          table_body.appendChild(row10)
-          table_body.appendChild(row11)
-          job_table.appendChild(table_body)
-          card_text.appendChild(job_table)
-          toggle_btn.appendChild(handle)
-          plus_icon.appendChild(icon_path)
-          pointer.appendChild(plus_icon)
-          card_body.appendChild(pointer)
-          card_body.appendChild(toggle_btn)
-          card_body.appendChild(close_btn)
-          card_body.appendChild(card_title)
-          card_body.appendChild(card_text)
-          card_body.appendChild(edit_btn)
-          job_card.appendChild(card_body)
-          job_col.appendChild(job_card)
-          jobs_row.appendChild(job_col)
-
-          ConnectFire()
-          let json_all = {
-            "job_no": new_job_nbr,
-            "enter_time": 0,
-            "exit_time": 0,
-            "min_profit": 0.1,
-            "max_profit": 40,
-            "max_loss": 0.4,
-            "rsi_ticker": "MSFT",
-            "rsi_low_value": 20,
-            "rsi_high_value": 80,
-            "rsi_low_pct": 15,
-            "rsi_high_pct": 85,  
-            "rsi_timeframe_unit": "minute",
-            "rsi_timeframe_length": 1,
-            "rsi_window": 14,
-            "size": 25,
-            "longshort": "Long",
-            "active": false,
-            "valueorpct": "Value",
-            "times": 1,
-            "status": "Out"
-          }
-          firebase.database().ref(`rsi_settings/job_${new_job_nbr}`).update(json_all)
-          let json_jobs = {"nbr_jobs": jobs_nbr + 1}
-          firebase.database().ref("rsi_settings/info").update(json_jobs)
-        }
-
-        let heroku_api = "{{heroku_api | safe}}";
-        let heroku_name = "{{heroku_name | safe}}";
-        let script_status = "unknown"
-        function GetScriptStatus() {
-          let script_box_color = document.getElementById("script_box_color")
-          let dyno_url = `https://api.heroku.com/apps/${heroku_name}/dynos`
-          var xhr = new XMLHttpRequest();
-          xhr.open("GET", dyno_url);
-          xhr.setRequestHeader("Accept", "application/vnd.heroku+json; version=3");
-          xhr.setRequestHeader("Content-Type", "application/json");
-          xhr.setRequestHeader("Authorization", `Bearer ${heroku_api}`);
-          xhr.send()
-          xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) {
-              let response = xhr.responseText
-              let json_response = JSON.parse(response)
-              let dynoList = []
-              json_response.forEach(dyno => {
-                if (dyno['command'] === 'python script.py') {
-                  dynoList.push(dyno);
-                }
-              });
-              let script_toggle_btn = document.getElementById("togglebtn0")
-              if (dynoList.length < 1) {
-                script_status = "Off"
-                if (script_toggle_btn.getAttribute("aria-pressed") != "false") {
-                  script_toggle_btn.setAttribute("aria-pressed", "false")
-                  script_toggle_btn.classList.remove("active")
-                  script_box_color.className = "card text-bg-secondary text-light"
-                }
-              } else {
-                script_status = "On"
-                if (script_toggle_btn.getAttribute("aria-pressed") != "true") {
-                  script_toggle_btn.setAttribute("aria-pressed", "true")
-                  script_toggle_btn.classList.add("active")
-                  script_box_color.className = "card text-bg-success text-light"
-                }
-              }
-            };
-          };
-          return script_status
-        };
-
-        GetScriptStatus()
-
-        function StartScript() {
-          let start_url = `https://api.heroku.com/apps/${heroku_name}/dynos`
-          var xhr = new XMLHttpRequest();
-          xhr.open("POST", start_url);
-          xhr.setRequestHeader("Accept", "application/vnd.heroku+json; version=3");
-          xhr.setRequestHeader("Content-Type", "application/json");
-          xhr.setRequestHeader("Authorization", `Bearer ${heroku_api}`); 
-          const json_data = {
-            "command": "python script.py",
-            "type": "run:detached"
-          }
-          xhr.send(JSON.stringify(json_data));
-          xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) {
-              script_status = "On"
-              let script_toggle_btn = document.getElementById("togglebtn0")
-                if (script_toggle_btn.getAttribute("aria-pressed") != "true") {
-                  script_toggle_btn.setAttribute("aria-pressed", "true")
-                  script_toggle_btn.classList.add("active")
-                  script_box_color.className = "card text-bg-success text-light"
-                };
-            };
-          };
-          script_status = "On"
-        };
-
-        function KillScript() {
-          let dyno_url = `https://api.heroku.com/apps/${heroku_name}/dynos`
-          var xhr = new XMLHttpRequest();
-          xhr.open("GET", dyno_url);
-          xhr.setRequestHeader("Accept", "application/vnd.heroku+json; version=3");
-          xhr.setRequestHeader("Content-Type", "application/json");
-          xhr.setRequestHeader("Authorization", `Bearer ${heroku_api}`);
-          xhr.send()
-          xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) {
-              let response = xhr.responseText
-              let json_response = JSON.parse(response)
-              let dynoList = []
-              json_response.forEach(dyno => {
-                if (dyno['command'] === 'python script.py') {
-                  dynoList.push(dyno);
-                }
-              });
-              const dyno_id = dynoList[0]['id']
-              let stop_url = `https://api.heroku.com/apps/${heroku_name}/dynos/${dyno_id}/actions/stop`
-              xhr.open("POST", stop_url);
-              xhr.setRequestHeader("Accept", "application/vnd.heroku+json; version=3");
-              xhr.setRequestHeader("Content-Type", "application/json");
-              xhr.setRequestHeader("Authorization", `Bearer ${heroku_api}`);
-              xhr.send()
-              xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                  script_status = "Off"
-                  let script_toggle_btn = document.getElementById("togglebtn0")
-                    if (script_toggle_btn.getAttribute("aria-pressed") != "false") {
-                      script_toggle_btn.setAttribute("aria-pressed", "false")
-                      script_toggle_btn.classList.remove("active")
-                    };
-                };
-              };
-            };
-          };
-          script_status = "Off"
-        };
-
-        function toggleScriptStatus() {
-          let script_box_color = document.getElementById("script_box_color")
-          let script_toggle_btn = document.getElementById("togglebtn0")
-          let btn_pressed = JSON.parse(script_toggle_btn.getAttribute("aria-pressed"))
-          if (script_toggle_btn.getAttribute("aria-pressed") != "false") {
-            KillScript()
-            script_box_color.className = "card text-bg-secondary text-light"
-          } else {
-            StartScript()
-            script_box_color.className = "card text-bg-success text-light"
-          };
-        }
-
-        function getJobStatus() {
-          ConnectFire()
-          let job_box_colors = document.querySelectorAll('[id^="job_box_color"]')
-          let i = 0
-          job_box_colors.forEach(box => {
-            i++
-            firebase.database().ref(`rsi_settings/job_${i}`).on("value", function(snapshot) {
-              let status = snapshot.val().status
-              if (status == "In") {
-                if (!box.classList.contains("border")) {
-                  box.classList.add("border", "border-5", "border-warning")
-                }
-              } else if (status == "Out") {
-                if (box.classList.contains("border")) {
-                  box.classList.remove("border", "border-5", "border-warning")
-                }
-              }
-            })
-          })
-          setTimeout(getJobStatus, 2000)
-        }
-
-        getJobStatus()
-
-        function checkFlat() {
-          ConnectFire()
-          firebase.database().ref("rsi_settings/info").on("value", function(snapshot) {
-              let flat = snapshot.val().flat
-              let flat_time = snapshot.val().flat_time
-              let year = flat_time.split('-')[0]
-              let month = flat_time.split('-')[1]
-              let day = flat_time.split('-')[2].split(' ')[0]
-              let hour = flat_time.split(' ')[1].split(':')[0]
-              let minute = flat_time.split(' ')[1].split(':')[1]
-              let second = flat_time.split(' ')[1].split(':')[2]
-              let flat_datetime = new Date(Date.UTC(year, month-1, day, hour, minute, second))
-              let tz_offset = 6
-              let now = new Date()
-              let diff_seconds = (now - flat_datetime) / 1000
-              let toggle_btns = document.querySelectorAll('[id^="toggle_btn"]')
-              let json_status = {"status": "Out"}
-              if (flat == true && diff_seconds > 30) {
-                let i = 0
-                toggle_btns.forEach(btn => {
-                  i++
-                  firebase.database().ref(`rsi_settings/job_${i}`).update(json_status)
-                })
-              }
-            })
-          setTimeout(checkFlat, 2000)
-        }
-
-        checkFlat()
+    displayInputs();
 
     </script>
 </body>

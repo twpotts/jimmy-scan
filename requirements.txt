@@ -1,5 +1,5 @@
 bs4
-chromedriver_py
+chromedriver_py==99.0.4844.51
 datetime
 Flask
 flask_login
@@ -9,6 +9,6 @@ gunicorn
 numpy
 pandas
 requests
-selenium
+selenium==3.141.0
 selenium_stealth
 ta
