@@ -13,6 +13,8 @@ import pandas as pd
 import numpy as np
 import ta
 import datetime as dt
+import pyrebase
+import pytz
 from selenium import webdriver
 from selenium_stealth import stealth
 from bs4 import BeautifulSoup
@@ -21,7 +23,7 @@ from chromedriver_py import binary_path
 # Web scrapes a list of symbols from FinViz (filters: index = S&P 500, optionable = True)
 
 user_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36'}
-nbr_symbols = 30
+nbr_symbols = 510
 symbols_list = []
 row_nbr = 1
 try:
@@ -153,6 +155,53 @@ def get_historical_data(symbol):
         data = data_request.content
     return data
 
+# Define function to get quote
+
+def get_quote(symbol):
+    symbol = symbol.upper()
+    auth = auth_tradier()
+    quote_url = '{}markets/quotes?symbols={}'.format(auth['tradier_base'], symbol)
+    quote_request = requests.get(quote_url, headers = auth['tradier_headers'])
+    if quote_request.status_code != 200:
+        quote = quote_request.content
+        print("Error: Could not get quotes")
+    else:
+        quote = json.loads(quote_request.content)
+        if 'quotes' in quote:
+            quote = quote['quotes']
+            if 'quote' in quote:
+                quote = quote['quote']
+    return quote
+
+# Define function to find 30-delta call
+
+def find_call(symbol):
+    auth = auth_tradier()
+    day = dt.datetime.now()
+    chain = None
+    while chain == None:
+        exp = day.strftime('%Y-%m-%d')
+        chain_url = '{}markets/options/chains?symbol={}&expiration={}&greeks=True'.format(auth['tradier_base'], symbol, exp)
+        chain_request = requests.get(chain_url, headers = auth['tradier_headers'])
+        if chain_request.status_code != 200:
+            chain = chain_request.content
+        else:
+            chain = json.loads(chain_request.content)
+            if 'options' in chain:
+                chain = chain['options']
+            if chain == None:
+                day = day + dt.timedelta(days=1)
+    if 'option' in chain:
+        chain = chain['option']
+    calls = [option for option in chain if option['option_type'] == 'call']
+    call_deltas = [call['greeks']['delta'] if call['greeks'] != None else 0 for call in calls]
+    desired_delta = 0.3
+    delta_diffs = list(abs(np.array(call_deltas) - desired_delta))
+    min_diff = min(delta_diffs)
+    min_idx = delta_diffs.index(min_diff)
+    desired_call = calls[min_idx]
+    return desired_call
+
 # Use TA library to create ThinkScript functions
 
 def ExpAverage(c, calcLength):
@@ -168,12 +217,20 @@ def CCI(h, l, c, cci_window):
 calcLength = 1
 smoothLength = 2
 
+# Connect to database
+
+db_config = config.db_config
+firebase = pyrebase.initialize_app(db_config)
+db = firebase.database()
+db_name = "scanner"
+
 # Execute the scan
 
 cutoff = len(symbols_list)
 watchlist_down, watchlist_up = [], []
 for symbol in symbols_list[:cutoff]:
-    print(symbols_list.index(symbol))
+    nbr = symbols_list.index(symbol)
+    print(nbr)
     if '-' in symbol:
         symbol = symbol.replace('-','/')
     data = get_historical_data(symbol)
@@ -199,7 +256,17 @@ for symbol in symbols_list[:cutoff]:
     if (C4DN and MOBDN and C14DN and C4CHGDN) \
     or (C4DN and MOBDN and C14DN and  MOBCHGDN) \
     or (C4DN and MOBDN and C14DN and C14CHGDN):
-        watchlist_down.append(symbol)
+        quote = get_quote(symbol)
+        call = find_call(symbol)
+        info_dict = {
+            "option_symbol": call['symbol'],
+            "symbol": call['underlying'],
+            "strike": call['strike'],
+            "expiration": call['expiration_date'],
+            "last": quote['last'],
+            "delta": round(float(call['greeks']['delta']),3)
+        }
+        watchlist_down.append(info_dict)
         print(f"{symbol} added to down watchlist")
     C4UP = CCI4.values[-2] < CCI4.values[-1]
     MOBUP = Main.values[-2] < Main.values[-1]
@@ -210,13 +277,73 @@ for symbol in symbols_list[:cutoff]:
     if (C4UP and MOBUP and C14UP and C4CHG) \
     or (C4UP and MOBUP and C14UP and  MOBCHG) \
     or (C4UP and MOBUP and C14UP and C14CHG):
-        watchlist_up.append(symbol)
+        quote = get_quote(symbol)
+        call = find_call(symbol)
+        if 'greeks' in call:
+            delta = call['greeks']['delta']
+        else:
+            delta = 0
+        info_dict = {
+            "option_symbol": call['symbol'],
+            "symbol": call['underlying'],
+            "strike": call['strike'],
+            "expiration": call['expiration_date'],
+            "last": quote['last'],
+            "delta": round(float(delta),3)
+        }
+        watchlist_up.append(info_dict)
         print(f"{symbol} added to up watchlist")
+    json_count = {
+        "counter": nbr,
+        "progress_pct": int((nbr + 1) / len(symbols_list) * 100 - 100),
+    }
+    if nbr == 0:
+        json_count["symbols_length"] = len(symbols_list)
+    db.child(db_name).child("info").update(json_count)
 
 # Display results
 
-print(f"Watchlist (down) ({len(watchlist_down)}) = {watchlist_down}")
-print(f"Watchlist (up) ({len(watchlist_up)}) = {watchlist_up}")
+# print(f"Watchlist (down) ({len(watchlist_down)}) = {watchlist_down}")
+# print(f"Watchlist (up) ({len(watchlist_up)}) = {watchlist_up}")
+
+# Store in database
+
+if watchlist_down == []:
+    watchlist_down = [{
+        "option_symbol": "NA",
+        "symbol": "NA",
+        "strike": "NA",
+        "expiration": "NA",
+        "last": "NA",
+        "delta": "NA"
+    }]
+if watchlist_up == []:
+    watchlist_up = [{
+        "option_symbol": "NA",
+        "symbol": "NA",
+        "strike": "NA",
+        "expiration": "NA",
+        "last": "NA",
+        "delta": "NA"
+    }]
+db.child(db_name).child("down_list").set(watchlist_down)
+db.child(db_name).child("up_list").set(watchlist_up)
+local_timezone = local_timezone = pytz.timezone('US/Eastern')
+now = dt.datetime.now()
+db_time = now.astimezone(local_timezone).strftime("%c")
+json_info = {
+    "time": db_time,
+    "counter": len(symbols_list) - 1,
+    "length_up": len(watchlist_up),
+    "length_down": len(watchlist_down)
+}
+db.child(db_name).child("info").update(json_info)
+
+# Fetch database
+
+# down_list = db.child(db_name).child("down_list").get().val()
+# up_list = db.child(db_name).child("up_list").get().val()
+# info = dict(db.child(db_name).child("info").get().val())
 
 # Not needed
 
