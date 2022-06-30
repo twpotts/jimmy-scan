@@ -9,6 +9,8 @@ gunicorn
 jwt
 numpy
 pandas
+pycrypto==2.6
+pycryptodome==3.14.1
 pyrebase
 pytz
 requests
