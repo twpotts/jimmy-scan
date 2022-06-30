@@ -2,7 +2,6 @@
     {% extends "navbar.html" %}
     {% block all_else %}
     <!-- Navbar end -->
-    <!-- Cards start -->
     <br><br>
     <section class="p-5">
       <div class="container">
@@ -46,11 +45,11 @@
         <div class="row" id="row4">
           <div class="col" id="col4">
             <div id="progress_header">
-              Symbols 0 / 200 (0 %)
+              Symbols 0 / 500 (0 %)
               <div class="progress-grid__container">
                 <div class="progress-bar__container">
                   <div class="progress-bar">
-                    <span class="progress-bar__text">Screener finished, paused</span>
+                    <span class="progress-bar__text">Screener finished, paused. Please refresh page to see update.</span>
                   </div>
                 </div>
               </div>
@@ -59,15 +58,107 @@
         </div>
         <div class="row" id="row5">
           <div class="col" id="col5">
-            <button id="btnExportToCsv" type="button" class="button">Export to CSV</button>&emsp;&emsp;</h3>
+            Last update: {{info['time']}}
           </div>
         </div>
+        <br>
+        <div class="row" id="row6">
+          <div class="col" id="col6">
+            <div class="accordion" id="accordionExample">
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Up List ({{info['length_up']}})
+                  </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                    <button id="btnExportToCsv1" type="button" class="button">Export to CSV</button>
+                    <br>
+                    <div class="table-responsive scroll">
+                      <table class="table" id="index_table1">
+                        <thead>
+                            <tr>
+                                <th><a href="javascript:SortTable(0,'T','',1);">Option Symbol</a></th>
+                                <th><a href="javascript:SortTable(1,'T','',1);">Symbol</a></th>
+                                <th><a href="javascript:SortTable(2,'D','mdy',1);">Expiration</a></th>
+                                <th><a href="javascript:SortTable(3,'N','',1);">Strike</a></th>
+                                <th><a href="javascript:SortTable(4,'N','',1);">Last</a></th>
+                                <th><a href="javascript:SortTable(5,'N','',1);">Delta</a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in up_list %}
+                              <tr style="display: table-row">
+                                  <td> {{ item['option_symbol'] }} </td>
+                                  <td> {{ item['symbol'] }} </td>
+                                  <td> {{ item['expiration'] }} </td>
+                                  <td> {{ item['strike'] }} </td>
+                                  <td> {{ item['last'] }} </td> 
+                                  <td> {{ item['delta'] }} </td> 
+                              </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                  </div>
+                </div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Down List ({{info['length_down']}})
+                  </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                    <button id="btnExportToCsv2" type="button" class="button">Export to CSV</button>
+                    <div class="table-responsive scroll">
+                      <table class="table" id="index_table2">
+                        <thead>
+                            <tr>
+                                <th><a href="javascript:SortTable(0,'T','',2);">Option Symbol</a></th>
+                                <th><a href="javascript:SortTable(1,'T','',2);">Symbol</a></th>
+                                <th><a href="javascript:SortTable(2,'D','mdy',2);">Expiration</a></th>
+                                <th><a href="javascript:SortTable(3,'N','',2);">Strike</a></th>
+                                <th><a href="javascript:SortTable(4,'N','',2);">Last</a></th>
+                                <th><a href="javascript:SortTable(5,'N','',2);">Delta</a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in down_list %}
+                              <tr style="display: table-row">
+                                  <td> {{ item['option_symbol'] }} </td>
+                                  <td> {{ item['symbol'] }} </td>
+                                  <td> {{ item['expiration'] }} </td>
+                                  <td> {{ item['strike'] }} </td>
+                                  <td> {{ item['last'] }} </td> 
+                                  <td> {{ item['delta'] }} </td>
+                              </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                  </div>
+                </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
       </div>
     </section>
-    <!-- Cards end -->
     <style>
       body {
         background-color: gainsboro;
+      }
+      .scroll {
+        max-height: 500px;
+        overflow: scroll
+      }
+      .scroll thead th {
+        background-color: white;
+        position: sticky;
+        top: 0
       }
       .pointer {
         cursor: pointer;
@@ -132,10 +223,186 @@
     <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-database.js"></script>
     <script>
 
-    const btnExportToCsv = document.getElementById("btnExportToCsv");
-    btnExportToCsv.addEventListener("click", () => {
+    function ConnectFire() {
+      const firebaseConfig = {{db_config | safe}};
+      if (firebase.apps.length === 0) {
+          firebase.initializeApp(firebaseConfig);
+          return true
+      } else {
+          return false
+      }
+    };
+
+    var TableLastSortedColumn = -1;
+      function SortTable() {
+        var sortColumn = parseInt(arguments[0]);
+        var type = arguments.length > 1 ? arguments[1] : 'T';
+        var dateformat = arguments.length > 2 ? arguments[2] : '';
+        var table_id = "index_table" + arguments[3]
+        var table = document.getElementById(table_id);
+        var tbody = table.getElementsByTagName("tbody")[0];
+        var rows = tbody.getElementsByTagName("tr");
+        var arrayOfRows = new Array();
+        type = type.toUpperCase();
+        dateformat = dateformat.toLowerCase();
+        for (var i = 0, len = rows.length; i < len; i++) {
+          arrayOfRows[i] = new Object;
+          arrayOfRows[i].oldIndex = i;
+          var celltext = rows[i].getElementsByTagName("td")[sortColumn].innerHTML.replace(/<[^>]*>/g, "");
+          if (type == 'D') { arrayOfRows[i].value = GetDateSortingKey(dateformat, celltext); }
+          else {
+            var re = type == "N" ? /[^\.\-\+\d]/g : /[^a-zA-Z0-9]/g;
+            arrayOfRows[i].value = celltext.replace(re, "").substr(0, 25).toLowerCase();
+          }
+        }
+        let ths = table.getElementsByTagName("th")
+        let idx = 0
+        while (idx < ths.length) {
+          ths[idx].innerHTML = String(ths[idx].innerHTML).split('</a>')[0] + '</a>'
+          idx++
+        };
+        console.log(sortColumn)
+        console.log(TableLastSortedColumn)
+        if (sortColumn == TableLastSortedColumn) {
+          if (localStorage.getItem("last_sort") == "down") {
+            ths[sortColumn].innerHTML = ths[sortColumn].innerHTML + "&#9650";
+            console.log("Up arrow")
+            localStorage.setItem("last_sort", "up")
+          } else {
+            ths[sortColumn].innerHTML = ths[sortColumn].innerHTML + "&#9660";
+            console.log("Down arrow")
+            localStorage.setItem("last_sort", "down")
+          };
+        } else {
+          ths[sortColumn].innerHTML = ths[sortColumn].innerHTML + "&#9660";
+          console.log("Down arrow")
+          localStorage.setItem("last_sort", "down")
+        };
+        if (sortColumn == TableLastSortedColumn) { arrayOfRows.reverse(); }
+        else {
+          TableLastSortedColumn = sortColumn;
+          switch (type) {
+            case "N": arrayOfRows.sort(CompareRowOfNumbers); break;
+            case "D": arrayOfRows.sort(CompareRowOfNumbers); break;
+            default: arrayOfRows.sort(CompareRowOfText);
+          }
+        }
+        var newTableBody = document.createElement("tbody");
+        for (var i = 0, len = arrayOfRows.length; i < len; i++) {
+          newTableBody.appendChild(rows[arrayOfRows[i].oldIndex].cloneNode(true));
+        }
+        table.replaceChild(newTableBody, tbody);
+        tableRowColor()
+        var tds = table.getElementsByTagName("td");
+        let j = 0;
+        while (j < tds.length) {
+          tds[j].style.background = "none"
+          j++
+        }
+        let k = sortColumn
+        while (k < tds.length) {
+          tds[k].style.background = "rgba(255, 255, 255, 0.507)"
+          k = k + 15
+        }
+      } // function SortTable()
+
+      function CompareRowOfText(a, b) {
+        var aval = a.value;
+        var bval = b.value;
+        return (aval == bval ? 0 : (aval > bval ? 1 : -1));
+      } // function CompareRowOfText()
+
+      function CompareRowOfNumbers(a, b) {
+        var aval = /\d/.test(a.value) ? parseFloat(a.value) : 0;
+        var bval = /\d/.test(b.value) ? parseFloat(b.value) : 0;
+        return (aval == bval ? 0 : (aval > bval ? 1 : -1));
+      } // function CompareRowOfNumbers()
+
+      function GetDateSortingKey(format, text) {
+        if (format.length < 1) { return ""; }
+        format = format.toLowerCase();
+        text = text.toLowerCase();
+        text = text.replace(/^[^a-z0-9]*/, "");
+        text = text.replace(/[^a-z0-9]*$/, "");
+        if (text.length < 1) { return ""; }
+        text = text.replace(/[^a-z0-9]+/g, ",");
+        var date = text.split(",");
+        if (date.length < 3) { return ""; }
+        var d = 0, m = 0, y = 0;
+        for (var i = 0; i < 3; i++) {
+          var ts = format.substr(i, 1);
+          if (ts == "d") { d = date[i]; }
+          else if (ts == "m") { m = date[i]; }
+          else if (ts == "y") { y = date[i]; }
+        }
+        d = d.replace(/^0/, "");
+        if (d < 10) { d = "0" + d; }
+        if (/[a-z]/.test(m)) {
+          m = m.substr(0, 3);
+          switch (m) {
+            case "jan": m = String(1); break;
+            case "feb": m = String(2); break;
+            case "mar": m = String(3); break;
+            case "apr": m = String(4); break;
+            case "may": m = String(5); break;
+            case "jun": m = String(6); break;
+            case "jul": m = String(7); break;
+            case "aug": m = String(8); break;
+            case "sep": m = String(9); break;
+            case "oct": m = String(10); break;
+            case "nov": m = String(11); break;
+            case "dec": m = String(12); break;
+            default: m = String(0);
+          }
+        }
+        m = m.replace(/^0/, "");
+        if (m < 10) { m = "0" + m; }
+        y = parseInt(y);
+        if (y < 100) { y = parseInt(y) + 2000; }
+        return "" + String(y) + "" + String(m) + "" + String(d) + "";
+      } // function GetDateSortingKey()
+
+    class TableCSVExporter {
+        constructor (table, includeHeaders = true) {
+            this.table = table;
+            this.rows = Array.from(table.querySelectorAll("tr"));
+            if (!includeHeaders && this.rows[0].querySelectorAll("th").length) {
+                this.rows.shift();
+            }
+        }
+        convertToCSV () {
+            const lines = [];
+            const numCols = this._findLongestRowLength();
+            for (const row of this.rows) {
+                let line = "";
+                for (let i = 0; i < numCols; i++) {
+                    if (row.children[i] !== undefined) {
+                        line += TableCSVExporter.parseCell(row.children[i]);
+                    }
+                    line += (i !== (numCols - 1)) ? "," : "";
+                }
+                lines.push(line);
+            }
+            return lines.join("\n");
+        }
+        _findLongestRowLength () {
+            return this.rows.reduce((l, row) => row.childElementCount > l ? row.childElementCount : l, 0);
+        }
+        static parseCell (tableCell) {
+            let parsedValue = tableCell.textContent;
+            parsedValue = parsedValue.replace(/"/g, `""`);
+            parsedValue = /[",\n]/.test(parsedValue) ? `"${parsedValue}"` : parsedValue;
+            return parsedValue;
+        }
+    }
+
+    const btnExportToCsv1 = document.getElementById("btnExportToCsv1");
+    btnExportToCsv1.addEventListener("click", () => {
         let indexTable = document.getElementById("index_table1");
         let indexTableHead = indexTable.getElementsByTagName("thead")[0]
         let indexTableBody = indexTable.getElementsByTagName("tbody")[0]
@@ -152,7 +419,32 @@
         const blobUrl = URL.createObjectURL(csvBlob);
         const anchorElement = document.createElement("a");
         anchorElement.href = blobUrl;
-        anchorElement.download = "table-export.csv";
+        anchorElement.download = "up_list.csv";
+        anchorElement.click();
+        setTimeout(() => {
+            URL.revokeObjectURL(blobUrl);
+        }, 500);
+    });
+
+    const btnExportToCsv2 = document.getElementById("btnExportToCsv2");
+    btnExportToCsv2.addEventListener("click", () => {
+        let indexTable = document.getElementById("index_table2");
+        let indexTableHead = indexTable.getElementsByTagName("thead")[0]
+        let indexTableBody = indexTable.getElementsByTagName("tbody")[0]
+        var tableRows = indexTable.getElementsByTagName('tr');
+        var rowCount = tableRows.length;
+        for (var x=rowCount-1; x>0; x--) {
+          if (tableRows[x].style.display == "none") {
+            indexTable.children[1].removeChild(tableRows[x]);
+          }
+        }
+        const exporter = new TableCSVExporter(indexTable);
+        const csvOutput = exporter.convertToCSV();
+        const csvBlob = new Blob([csvOutput], { type: "text/csv" });
+        const blobUrl = URL.createObjectURL(csvBlob);
+        const anchorElement = document.createElement("a");
+        anchorElement.href = blobUrl;
+        anchorElement.download = "down_list.csv";
         anchorElement.click();
         setTimeout(() => {
             URL.revokeObjectURL(blobUrl);
@@ -175,6 +467,50 @@
     }
 
     displayInputs();
+
+    function toggleTable(clicked_nbr) {
+      let index_table1 = document.getElementById("index_table1");
+      let index_table2 = document.getElementById("index_table2");
+      if (clicked_nbr == 1) {
+        index_table1.style.visibility="visible"
+        index_table2.style.visibility="hidden"
+      } else if (clicked_nbr == 2) {
+        index_table1.style.visibility="hidden"
+        index_table2.style.visibility="visible"
+      }
+    }
+
+    function sleep(sleepDuration) {
+      var now = new Date().getTime();
+      while (new Date().getTime() < now + sleepDuration) { /* Do nothing */ }
+    }
+
+    function monitorUpdate() {
+      let progressBarContainer = document.querySelector('.progress-bar__container');
+      let progressBar = document.querySelector('.progress-bar');
+      let progressBarText = document.querySelector('.progress-bar__text');
+      let progressHeader = document.getElementById("progress_header");
+      ConnectFire()
+      firebase.database().ref("scanner/info").on("value", function(snapshot) {
+        let counter = snapshot.val().counter
+        let symbols_length = snapshot.val().symbols_length
+        let progress_pct = snapshot.val().progress_pct
+        progressBar.style.left = `${progress_pct}%`
+        let oldText = progressHeader.innerHTML.split('%)')[0] + "%)"
+        let newText = `Symbols ${counter + 1} / ${symbols_length} (${progress_pct + 100} %)`
+        if (oldText != newText) {
+          progressHeader.innerHTML = newText + progressHeader.innerHTML.split('%)')[1]
+        }
+        if (counter + 1 == symbols_length) {
+          progressBarText.style.display = "contents"
+        } else {
+          progressBarText.style.display = "none"
+        }
+      })
+      setTimeout(monitorUpdate, 2000)
+    }
+
+    monitorUpdate()
 
     </script>
 </body>

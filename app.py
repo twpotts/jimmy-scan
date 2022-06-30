@@ -13,6 +13,10 @@ import requests
 import json
 import pandas as pd
 import numpy as np
+import datetime as dt
+import pyrebase
+import pytz
+import time
 
 # Create a Flask app
 
@@ -116,21 +120,70 @@ with open("tickers_dict.txt", "r") as file:
     tickers_dict = dict(zip(tickers, companies))
     file.close()
 
+# Firebase
+
+fire_config = config.db_config
+db_name = "scanner"
+
 # Create a route for the app: Whatever follows the slash how you access that page (jimmy-scan.herokuapp.com/)
 
 @app.route('/', methods=["GET", "POST"])
 @login_required
 def home():    
 
-    if request.method == "POST":
-        scan = request.form.to_dict()
-        periods_unit = str(scan['periods_unit'])
-        periods_back = int(scan['periods_back'])
+    firebase = pyrebase.initialize_app(fire_config)
+    fire_db = firebase.database()
+
+    # If first time logging in as any user, create database
+
+    sub_dbs = list(fire_db.get().val().keys())
+    
+    if db_name not in sub_dbs:
+        watchlist_down = [{
+            "option_symbol": "NA",
+            "symbol": "NA",
+            "strike": "NA",
+            "expiration": "NA",
+            "last": "NA",
+            "delta": "NA"
+        }]
+        watchlist_up = [{
+            "option_symbol": "NA",
+            "symbol": "NA",
+            "strike": "NA",
+            "expiration": "NA",
+            "last": "NA",
+            "delta": "NA"
+        }]
+        db.child(db_name).child("down_list").set(watchlist_down)
+        db.child(db_name).child("up_list").set(watchlist_up)
+        local_timezone = local_timezone = pytz.timezone('US/Pacific')
+        now = dt.datetime.now()
+        db_time = now.astimezone(local_timezone).strftime("%c")
+        json_info = {
+            "time": db_time,
+            "counter": 0,
+            "symbols_length": 0,
+            "progress_pct": 0,
+            "length_up": 0,
+            "length_down": 0,
+        }
+        fire_db.child(db_name).child("info").set(json_info)
+        time.sleep(1)
+        firebase = pyrebase.initialize_app(fire_config)
+        fire_db = firebase.database()
+
+    # Fetch data
+
+    down_list = fire_db.child(db_name).child("down_list").get().val()
+    up_list = fire_db.child(db_name).child("up_list").get().val()
+    info = dict(fire_db.child(db_name).child("info").get().val())
 
     # Pass that data to the HTML front-end
 
     return render_template('home.html', heroku_api = config.heroku_api, heroku_name = config.heroku_name, 
-                            current_user = current_user, tickers_dict = tickers_dict)
+                            script_name = config.script_name, current_user = current_user, down_list = down_list,
+                            up_list = up_list, info = info, db_config = fire_config)
 
 # Create positions page
 
