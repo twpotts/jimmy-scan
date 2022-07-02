@@ -167,6 +167,11 @@ def home():
             "progress_pct": 0,
             "length_up": 0,
             "length_down": 0,
+            "list_scanned": "S&P500",
+            "cutoff": 503,
+            "delta": 30,
+            "DTE_min": 0,
+            "DTE_max": 7
         }
         fire_db.child(db_name).child("info").set(json_info)
         time.sleep(1)
@@ -181,7 +186,7 @@ def home():
 
     # Pass that data to the HTML front-end
 
-    return render_template('home.html', heroku_api = config.heroku_api, heroku_name = config.heroku_name, 
+    return render_template('home.html', heroku_api = config.heroku_api, heroku_name = config.heroku_name,
                             script_name = config.script_name, current_user = current_user, down_list = down_list,
                             up_list = up_list, info = info, db_config = fire_config)
 

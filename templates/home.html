@@ -7,144 +7,167 @@
       <div class="container">
         <div class="row" id="row1">
           <div class="col" id="col1">
-            <h3>Jimmy Scan&nbsp;<button class="viz_submit" onclick="clearInputs()">Clear</button></h3>
+            <h3>Jimmy Scan</h3>
           </div>
         </div>
-        <form action="/" method="POST">
-          <div class="row" id="row2">
-            <div class="col" id="col2">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Periods Back</th>
-                    <th>Period Unit</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><input id="periods_back" name="periods_back"></td>
-                    <td>
-                      <select id="periods_unit" name="periods_unit">
-                        <option></option>
-                        <option value="daily">daily</option>
-                        <option value="weekly">weekly</option>
-                        <option value="monthly">monthly</option>
-                      </select>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+        <div class="row" id="row2">
+          <div class="col" id="col2">
+            <div class="accordion" id="accordionSettings" style="max-width:500px">
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingZero">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZero" aria-expanded="true" aria-controls="collapseZero">
+                    Scan Settings
+                  </button>
+                </h2>
+                <div id="collapseZero" class="accordion-collapse collapse" aria-labelledby="headingZero" data-bs-parent="#accordionSettings">
+                  <div class="accordion-body">
+                    <div class="table-responsive">
+                      <table class="table" id="settings_table">
+                        <thead>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <th>List scanned</th>
+                            <td id="list_scanned">{{info['list_scanned']}}</td>
+                          </tr>
+                          <tr>
+                            <th>Cutoff number (0-503)</th>
+                            <td id="cutoff">{{info['cutoff']}}</td>
+                          </tr>
+                          <tr>
+                            <th>Delta</th>
+                            <td id="delta">{{info['delta']}}</td>
+                          </tr>
+                          <tr>
+                            <th>OI min</th>
+                            <td id="min_oi">{{info['min_oi']}}</td>
+                          </tr>
+                          <tr>
+                            <th>DTE min</th>
+                            <td id="DTE_min">{{info['DTE_min']}}</td>
+                          </tr>
+                          <tr>
+                            <th>DTE max</th>
+                            <td id="DTE_max">{{info['DTE_max']}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <button id="change_settings" class="btn btn-dark" type="button" onclick="editSettings()">Edit Settings</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="row" id="row3">
             <div class="col" id="col3">
-              <input class="viz_submit" type="Submit" onclick="storeInputs()">
+              <br>
+              <button class="btn btn-dark" onclick="startScript()">Scan Now</button>
             </div>
           </div>
-        </form>
-        <div class="row" id="row4">
-          <div class="col" id="col4">
-            <div id="progress_header">
-              Symbols 0 / 500 (0 %)
-              <div class="progress-grid__container">
-                <div class="progress-bar__container">
-                  <div class="progress-bar">
-                    <span class="progress-bar__text">Screener finished, paused. Please refresh page to see update.</span>
+          <div class="row" id="row4">
+            <div class="col" id="col4">
+              <div id="progress_header">
+                Symbols 0 / 500 (0 %)
+                <div class="progress-grid__container">
+                  <div class="progress-bar__container">
+                    <div class="progress-bar">
+                      <span class="progress-bar__text">Screener finished, paused. Please refresh page to see update.</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="row" id="row5">
-          <div class="col" id="col5">
-            Last update: {{info['time']}}
+          <div class="row" id="row5">
+            <div class="col" id="col5">
+              Last update: {{info['time']}}
+            </div>
           </div>
-        </div>
-        <br>
-        <div class="row" id="row6">
-          <div class="col" id="col6">
-            <div class="accordion" id="accordionExample">
-              <div class="accordion-item">
-                <h2 class="accordion-header" id="headingOne">
-                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    Up List ({{info['length_up']}})
-                  </button>
-                </h2>
-                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                  <div class="accordion-body">
-                    <button id="btnExportToCsv1" type="button" class="button">Export to CSV</button>
-                    <br>
-                    <div class="table-responsive scroll">
-                      <table class="table" id="index_table1">
-                        <thead>
+          <br>
+          <div class="row" id="row6">
+            <div class="col" id="col6">
+              <div class="accordion" id="accordionExample">
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                      Up List ({{info['length_up']}})
+                    </button>
+                  </h2>
+                  <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                      <button id="btnExportToCsv1" type="button" class="button">Export to CSV</button>
+                      <br>
+                      <div class="table-responsive scroll">
+                        <table class="table" id="index_table1">
+                          <thead>
                             <tr>
-                                <th><a href="javascript:SortTable(0,'T','',1);">Option Symbol</a></th>
-                                <th><a href="javascript:SortTable(1,'T','',1);">Symbol</a></th>
-                                <th><a href="javascript:SortTable(2,'D','mdy',1);">Expiration</a></th>
-                                <th><a href="javascript:SortTable(3,'N','',1);">Strike</a></th>
-                                <th><a href="javascript:SortTable(4,'N','',1);">Last</a></th>
-                                <th><a href="javascript:SortTable(5,'N','',1);">Delta</a></th>
+                              <th><a href="javascript:SortTable(0,'T','',1);">Option Symbol</a></th>
+                              <th><a href="javascript:SortTable(1,'T','',1);">Symbol</a></th>
+                              <th><a href="javascript:SortTable(2,'D','mdy',1);">Expiration</a></th>
+                              <th><a href="javascript:SortTable(3,'N','',1);">Strike</a></th>
+                              <th><a href="javascript:SortTable(4,'N','',1);">Last</a></th>
+                              <th><a href="javascript:SortTable(5,'N','',1);">Delta</a></th>
                             </tr>
-                        </thead>
-                        <tbody>
+                          </thead>
+                          <tbody>
                             {% for item in up_list %}
-                              <tr style="display: table-row">
-                                  <td> {{ item['option_symbol'] }} </td>
-                                  <td> {{ item['symbol'] }} </td>
-                                  <td> {{ item['expiration'] }} </td>
-                                  <td> {{ item['strike'] }} </td>
-                                  <td> {{ item['last'] }} </td> 
-                                  <td> {{ item['delta'] }} </td> 
-                              </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                  </div>
-                </div>
-                </div>
-              </div>
-              <div class="accordion-item">
-                <h2 class="accordion-header" id="headingTwo">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                    Down List ({{info['length_down']}})
-                  </button>
-                </h2>
-                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-                  <div class="accordion-body">
-                    <button id="btnExportToCsv2" type="button" class="button">Export to CSV</button>
-                    <div class="table-responsive scroll">
-                      <table class="table" id="index_table2">
-                        <thead>
-                            <tr>
-                                <th><a href="javascript:SortTable(0,'T','',2);">Option Symbol</a></th>
-                                <th><a href="javascript:SortTable(1,'T','',2);">Symbol</a></th>
-                                <th><a href="javascript:SortTable(2,'D','mdy',2);">Expiration</a></th>
-                                <th><a href="javascript:SortTable(3,'N','',2);">Strike</a></th>
-                                <th><a href="javascript:SortTable(4,'N','',2);">Last</a></th>
-                                <th><a href="javascript:SortTable(5,'N','',2);">Delta</a></th>
+                            <tr style="display: table-row">
+                              <td> {{ item['option_symbol'] }} </td>
+                              <td> {{ item['symbol'] }} </td>
+                              <td> {{ item['expiration'] }} </td>
+                              <td> {{ item['strike'] }} </td>
+                              <td> {{ item['last'] }} </td> 
+                              <td> {{ item['delta'] }} </td> 
                             </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in down_list %}
-                              <tr style="display: table-row">
-                                  <td> {{ item['option_symbol'] }} </td>
-                                  <td> {{ item['symbol'] }} </td>
-                                  <td> {{ item['expiration'] }} </td>
-                                  <td> {{ item['strike'] }} </td>
-                                  <td> {{ item['last'] }} </td> 
-                                  <td> {{ item['delta'] }} </td>
-                              </tr>
                             {% endfor %}
-                        </tbody>
-                    </table>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   </div>
                 </div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                      Down List ({{info['length_down']}})
+                    </button>
+                  </h2>
+                  <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                      <button id="btnExportToCsv2" type="button" class="button">Export to CSV</button>
+                      <div class="table-responsive scroll">
+                        <table class="table" id="index_table2">
+                          <thead>
+                            <tr>
+                              <th><a href="javascript:SortTable(0,'T','',2);">Option Symbol</a></th>
+                              <th><a href="javascript:SortTable(1,'T','',2);">Symbol</a></th>
+                              <th><a href="javascript:SortTable(2,'D','mdy',2);">Expiration</a></th>
+                              <th><a href="javascript:SortTable(3,'N','',2);">Strike</a></th>
+                              <th><a href="javascript:SortTable(4,'N','',2);">Last</a></th>
+                              <th><a href="javascript:SortTable(5,'N','',2);">Delta</a></th>
+                            </tr>
+                          </thead>
+                        <tbody>
+                          {% for item in down_list %}
+                          <tr style="display: table-row">
+                            <td> {{ item['option_symbol'] }} </td>
+                            <td> {{ item['symbol'] }} </td>
+                            <td> {{ item['expiration'] }} </td>
+                            <td> {{ item['strike'] }} </td>
+                            <td> {{ item['last'] }} </td> 
+                            <td> {{ item['delta'] }} </td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
         </div>
-      </div>
       </div>
     </section>
     <style>
@@ -205,19 +228,7 @@
       .progress-bar__text {
         display: none;
       }
-      .viz_submit {
-        margin-top: 1vmax;
-        border: 1px solid #55acee;
-        outline: none;
-        background-color: #55acee;
-        color: white;
-        cursor: pointer;
-        transition: 0.3s;
-      }
-      .viz_submit:hover {
-        background-color: white;
-        color: #55acee
-      }
+
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
@@ -237,6 +248,132 @@
           return false
       }
     };
+
+    function editSettings() {
+      let list_scanned = document.getElementById("list_scanned")
+      let cutoff = document.getElementById("cutoff")
+      let delta = document.getElementById("delta")
+      let min_oi = document.getElementById("min_oi")
+      let DTE_min = document.getElementById("DTE_min")
+      let DTE_max = document.getElementById("DTE_max")
+
+      let input1 = document.createElement("select")
+      let input1a = document.createElement("option")
+      list_options = ["S&P500"]
+      input1a.value = list_options[0]
+      input1a.textContent = list_options[0]
+      input1.appendChild(input1a)
+      list_scanned.parentElement.appendChild(input1)
+      list_scanned.parentElement.removeChild(list_scanned)
+      input1.id = `list_scanned_input`
+      input1.selectedIndex = list_options.indexOf(list_scanned.textContent)
+
+      let input2 = document.createElement("input")
+      input2.value = cutoff.textContent
+      cutoff.parentElement.appendChild(input2)
+      cutoff.parentElement.removeChild(cutoff)
+      input2.id = `cutoff_input`
+      
+      let input3 = document.createElement("input")
+      input3.value = delta.textContent
+      delta.parentElement.appendChild(input3)
+      delta.parentElement.removeChild(delta)
+      input3.id = `delta_input`
+      
+      let input4 = document.createElement("input")
+      input4.value = min_oi.textContent
+      min_oi.parentElement.appendChild(input4)
+      min_oi.parentElement.removeChild(min_oi)
+      input4.id = `min_oi_input`
+      
+      let input5 = document.createElement("input")
+      input5.value = DTE_min.textContent
+      DTE_min.parentElement.appendChild(input5)
+      DTE_min.parentElement.removeChild(DTE_min)
+      input5.id = `DTE_min_input`
+
+      let input6 = document.createElement("input")
+      input6.value = DTE_max.textContent
+      DTE_max.parentElement.appendChild(input6)
+      DTE_max.parentElement.removeChild(DTE_max)
+      input6.id = `DTE_max_input`
+
+      let edit_btn = document.getElementById("change_settings")
+      let submit_btn = document.createElement("button")
+      submit_btn.innerHTML = "Submit Settings"
+      submit_btn.className = "btn btn-primary"
+      submit_btn.id = "submit_settings"
+      submit_btn.onclick = function() {submitSettings()}
+      edit_btn.parentElement.appendChild(submit_btn)
+      edit_btn.parentElement.removeChild(edit_btn)
+    };
+
+    function submitSettings() {
+        let list_scanned_input = document.getElementById(`list_scanned_input`)
+        let cutoff_input = document.getElementById(`cutoff_input`)
+        let delta_input = document.getElementById(`delta_input`)
+        let min_oi_input = document.getElementById(`min_oi_input`)
+        let DTE_min_input = document.getElementById(`DTE_min_input`)
+        let DTE_max_input = document.getElementById(`DTE_max_input`)
+
+        let list_scanned_td = document.createElement("td")
+        let cutoff_td = document.createElement("td")
+        let delta_td = document.createElement("td")
+        let min_oi_td = document.createElement("td")
+        let DTE_min_td = document.createElement("td")
+        let DTE_max_td = document.createElement("td")
+
+        list_scanned_td.id = `list_scanned`
+        cutoff_td.id = `cutoff`
+        delta_td.id = `delta`
+        min_oi_td.id = `min_oi`
+        DTE_min_td.id = `DTE_min`
+        DTE_max_td.id = `DTE_max`
+
+        list_scanned_td.textContent = list_scanned_input.value
+        cutoff_td.textContent = cutoff_input.value
+        delta_td.textContent = delta_input.value
+        min_oi_td.textContent = min_oi_input.value
+        DTE_min_td.textContent = DTE_min_input.value
+        DTE_max_td.textContent = DTE_max_input.value
+
+        list_scanned_input.parentElement.appendChild(list_scanned_td)
+        cutoff_input.parentElement.appendChild(cutoff_td)
+        delta_input.parentElement.appendChild(delta_td)
+        min_oi_input.parentElement.appendChild(min_oi_td)
+        DTE_min_input.parentElement.appendChild(DTE_min_td)
+        DTE_max_input.parentElement.appendChild(DTE_max_td)
+
+        list_scanned_input.parentElement.removeChild(list_scanned_input)
+        cutoff_input.parentElement.removeChild(cutoff_input)
+        delta_input.parentElement.removeChild(delta_input)
+        min_oi_input.parentElement.removeChild(min_oi_input)
+        DTE_min_input.parentElement.removeChild(DTE_min_input)
+        DTE_max_input.parentElement.removeChild(DTE_max_input)
+
+        let edit_btn_new = document.createElement("button")
+        edit_btn_new.className = "btn btn-dark"
+        edit_btn_new.id = "change_settings"
+        edit_btn_new.textContent = "Edit Settings"
+        edit_btn_new.onclick = function() {editSettings()}
+
+        let submit_btn = document.getElementById("submit_settings")
+        submit_btn.parentElement.appendChild(edit_btn_new)
+        submit_btn.parentElement.removeChild(submit_btn)
+
+        let json_all = {
+          "list_scanned": String(list_scanned_input.value),
+          "cutoff": parseInt(cutoff_input.value),
+          "delta": parseInt(delta_input.value),
+          "min_oi": parseInt(min_oi_input.value),
+          "DTE_min": parseInt(DTE_min_input.value),
+          "DTE_max": parseInt(DTE_max_input.value),
+        }
+
+        ConnectFire()
+        console.log(json_all)
+        firebase.database().ref(`scanner/info`).update(json_all)
+      }
 
     var TableLastSortedColumn = -1;
       function SortTable() {
@@ -451,39 +588,27 @@
         }, 500);
     });
 
-    function storeInputs() {
-      localStorage.setItem("periods_back", document.getElementById("periods_back").value);
-      localStorage.setItem("periods_unit", document.getElementById("periods_unit").value);
-    }
-
-    function clearInputs() {
-      document.getElementById("periods_back").value = '';
-      document.getElementById("periods_unit").value = '';
-    }
-
-    function displayInputs() {
-      document.getElementById("periods_back").value = localStorage.getItem("periods_back");
-      document.getElementById("periods_unit").value = localStorage.getItem("periods_unit");
-    }
-
-    displayInputs();
-
-    function toggleTable(clicked_nbr) {
-      let index_table1 = document.getElementById("index_table1");
-      let index_table2 = document.getElementById("index_table2");
-      if (clicked_nbr == 1) {
-        index_table1.style.visibility="visible"
-        index_table2.style.visibility="hidden"
-      } else if (clicked_nbr == 2) {
-        index_table1.style.visibility="hidden"
-        index_table2.style.visibility="visible"
+    let heroku_name = "{{heroku_name | safe}}";
+    let heroku_api = "{{heroku_api | safe}}";
+    let script_name = "{{script_name | safe}}";
+    function startScript() {
+      let start_url = `https://api.heroku.com/apps/${heroku_name}/dynos`
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", start_url);
+      xhr.setRequestHeader("Accept", "application/vnd.heroku+json; version=3");
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.setRequestHeader("Authorization", `Bearer ${heroku_api}`); 
+      const json_data = {
+        "command": `python ${script_name}.py`,
+        "type": "run:detached"
       }
-    }
-
-    function sleep(sleepDuration) {
-      var now = new Date().getTime();
-      while (new Date().getTime() < now + sleepDuration) { /* Do nothing */ }
-    }
+      xhr.send(JSON.stringify(json_data));
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          // Do nothing
+        };
+      };
+    };
 
     function monitorUpdate() {
       let progressBarContainer = document.querySelector('.progress-bar__container');

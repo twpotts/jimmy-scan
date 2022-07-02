@@ -22,76 +22,79 @@ from chromedriver_py import binary_path
 
 # Web scrapes a list of symbols from FinViz (filters: index = S&P 500, optionable = True)
 
-user_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36'}
-nbr_symbols = 510
-symbols_list = []
-row_nbr = 1
-try:
-    # Beautiful Soup 1st
-    while row_nbr < nbr_symbols:
-        print(row_nbr)
-        finviz_url = f'https://finviz.com/screener.ashx?v=111&f=idx_sp500,sh_opt_option&ft=4&o=-volume&r={row_nbr}'
-        response = requests.get(finviz_url, headers = user_headers)
-        html = response.content
-        soup = BeautifulSoup(html, 'html.parser')
-        table = soup.find('table', {"class": 'table-light'})
-        trs = table.find_all('tr')[1:]
-        tds = [tr.find_all('td') for tr in trs]
-        page = [row.string for row in table.find_all('a', {'class': 'screener-link-primary'})]
-        for symbol in page:
-            symbols_list.append(symbol)
-        row_nbr += 20
-    last_idx = symbols_list.index(symbols_list[-1])
-    symbols_list = symbols_list[:last_idx+1]
-    with open("symbols_list.txt", "w") as f:
-        for symbol in symbols_list:
-            f.write(symbol + "\n")
-        f.close()
-    print("Successful web scrape from FinViz using Beautiful Soup")
-except Exception as e:
-    print("Error web scraping from FinViz using Beautiful Soup")
-    print(e)
-    # Selenium stealth 2nd
-    try:
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument("--headless")
-        driver = webdriver.Chrome(executable_path = binary_path, options = chrome_options)
-        # Don't get detected by website
-        stealth(driver,
-                languages=["en-US", "en"],
-                vendor="Google Inc.",
-                platform="Win32",
-                webgl_vendor="Intel Inc.",
-                renderer="Intel Iris OpenGL Engine",
-                fix_hairline=True,
-        )
-        symbols_list = []
-        row_nbr = 1
-        while row_nbr < nbr_symbols:
-            print(row_nbr)
-            finviz_url = f'https://finviz.com/screener.ashx?v=111&f=idx_sp500,sh_opt_option&ft=4&o=-volume&r={row_nbr}'
-            driver.get(finviz_url)
-            table = driver.find_elements_by_class_name("table-light")[0]
-            trs = table.find_elements_by_tag_name('tr')[1:]
-            tds = [tr.find_elements_by_tag_name('td') for tr in trs]
-            page = [row.text for row in table.find_elements_by_class_name('screener-link-primary')]
-            for symbol in page:
-                symbols_list.append(symbol)
-            row_nbr += 20
-        driver.quit()
-        last_idx = symbols_list.index(symbols_list[-1])
-        symbols_list = symbols_list[:last_idx+1]
-        with open("symbols_list.txt", "w") as f:
-            for symbol in symbols_list:
-                f.write(symbol + "\n")
-            f.close()
-        print("Successful web scrape from FinViz using Selenium Stealth")
-    except Exception as e2:
-        print("Error web scraping from FinViz using Selenium Stealth")
-        print(e2)
-        with open("symbols_list.txt") as f:
-            items = f.readlines()
-            symbols_list = [item.split('\n')[0] for item in items]
+# user_headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36'}
+# nbr_symbols = 510
+# symbols_list = []
+# row_nbr = 1
+# try:
+#     # Beautiful Soup 1st
+#     while row_nbr < nbr_symbols:
+#         print(row_nbr)
+#         finviz_url = f'https://finviz.com/screener.ashx?v=111&f=idx_sp500,sh_opt_option&ft=4&o=-volume&r={row_nbr}'
+#         response = requests.get(finviz_url, headers = user_headers)
+#         html = response.content
+#         soup = BeautifulSoup(html, 'html.parser')
+#         table = soup.find('table', {"class": 'table-light'})
+#         trs = table.find_all('tr')[1:]
+#         tds = [tr.find_all('td') for tr in trs]
+#         page = [row.string for row in table.find_all('a', {'class': 'screener-link-primary'})]
+#         for symbol in page:
+#             symbols_list.append(symbol)
+#         row_nbr += 20
+#     last_idx = symbols_list.index(symbols_list[-1])
+#     symbols_list = symbols_list[:last_idx+1]
+#     with open("symbols_list.txt", "w") as f:
+#         for symbol in symbols_list:
+#             f.write(symbol + "\n")
+#         f.close()
+#     print("Successful web scrape from FinViz using Beautiful Soup")
+# except Exception as e:
+#     print("Error web scraping from FinViz using Beautiful Soup")
+#     print(e)
+#     # Selenium stealth 2nd
+#     try:
+#         chrome_options = webdriver.ChromeOptions()
+#         chrome_options.add_argument("--headless")
+#         driver = webdriver.Chrome(executable_path = binary_path, options = chrome_options)
+#         # Don't get detected by website
+#         stealth(driver,
+#                 languages=["en-US", "en"],
+#                 vendor="Google Inc.",
+#                 platform="Win32",
+#                 webgl_vendor="Intel Inc.",
+#                 renderer="Intel Iris OpenGL Engine",
+#                 fix_hairline=True,
+#         )
+#         symbols_list = []
+#         row_nbr = 1
+#         while row_nbr < nbr_symbols:
+#             print(row_nbr)
+#             finviz_url = f'https://finviz.com/screener.ashx?v=111&f=idx_sp500,sh_opt_option&ft=4&o=-volume&r={row_nbr}'
+#             driver.get(finviz_url)
+#             table = driver.find_elements_by_class_name("table-light")[0]
+#             trs = table.find_elements_by_tag_name('tr')[1:]
+#             tds = [tr.find_elements_by_tag_name('td') for tr in trs]
+#             page = [row.text for row in table.find_elements_by_class_name('screener-link-primary')]
+#             for symbol in page:
+#                 symbols_list.append(symbol)
+#             row_nbr += 20
+#         driver.quit()
+#         last_idx = symbols_list.index(symbols_list[-1])
+#         symbols_list = symbols_list[:last_idx+1]
+#         with open("symbols_list.txt", "w") as f:
+#             for symbol in symbols_list:
+#                 f.write(symbol + "\n")
+#             f.close()
+#         print("Successful web scrape from FinViz using Selenium Stealth")
+#     except Exception as e2:
+#         print("Error web scraping from FinViz using Selenium Stealth")
+#         print(e2)
+
+# Extract symbols list
+
+with open("symbols_list.txt") as f:
+    items = f.readlines()
+    symbols_list = [item.split('\n')[0] for item in items]
 
 # Import sensitive items from config
 
@@ -126,6 +129,22 @@ def auth_tradier(paper_trading=True):
 # Execute the function
 
 auth_trad = auth_tradier()
+
+# Connect to database
+
+db_config = config.db_config
+firebase = pyrebase.initialize_app(db_config)
+db = firebase.database()
+db_name = "scanner"
+
+# Retrieve database values
+
+info = dict(db.child(db_name).child("info").get().val())
+DTE_max = int(info['DTE_max'])
+DTE_min = int(info['DTE_min'])
+cutoff = int(info['cutoff'])
+delta = int(info['delta'])
+min_oi = int(info['min_oi'])
 
 # Define function to get historical data from Tradier
 
@@ -177,10 +196,11 @@ def get_quote(symbol):
 
 def find_call(symbol):
     auth = auth_tradier()
-    day = dt.datetime.now()
+    day_start = dt.datetime.now() + dt.timedelta(days=DTE_min)
+    day_max = dt.datetime.now() + dt.timedelta(days=DTE_max)
     chain = None
     while chain == None:
-        exp = day.strftime('%Y-%m-%d')
+        exp = day_start.strftime('%Y-%m-%d')
         chain_url = '{}markets/options/chains?symbol={}&expiration={}&greeks=True'.format(auth['tradier_base'], symbol, exp)
         chain_request = requests.get(chain_url, headers = auth['tradier_headers'])
         if chain_request.status_code != 200:
@@ -190,12 +210,12 @@ def find_call(symbol):
             if 'options' in chain:
                 chain = chain['options']
             if chain == None:
-                day = day + dt.timedelta(days=1)
+                day_start = day_start + dt.timedelta(days=1)
     if 'option' in chain:
         chain = chain['option']
-    calls = [option for option in chain if option['option_type'] == 'call']
+    calls = [option for option in chain if option['option_type'] == 'call' and option['open_interest'] > min_oi]
     call_deltas = [call['greeks']['delta'] if call['greeks'] != None else 0 for call in calls]
-    desired_delta = 0.3
+    desired_delta = delta / 100
     delta_diffs = list(abs(np.array(call_deltas) - desired_delta))
     min_diff = min(delta_diffs)
     min_idx = delta_diffs.index(min_diff)
@@ -217,16 +237,8 @@ def CCI(h, l, c, cci_window):
 calcLength = 1
 smoothLength = 2
 
-# Connect to database
-
-db_config = config.db_config
-firebase = pyrebase.initialize_app(db_config)
-db = firebase.database()
-db_name = "scanner"
-
 # Execute the scan
 
-cutoff = len(symbols_list)
 watchlist_down, watchlist_up = [], []
 for symbol in symbols_list[:cutoff]:
     nbr = symbols_list.index(symbol)
@@ -280,9 +292,15 @@ for symbol in symbols_list[:cutoff]:
         quote = get_quote(symbol)
         call = find_call(symbol)
         if 'greeks' in call:
-            delta = call['greeks']['delta']
+            if call['greeks'] != None:
+                if 'delta' in call['greeks']:
+                    greek_delta = call['greeks']['delta']
+                else:
+                    greek_delta = 0
+            else:
+                greek_delta = 0
         else:
-            delta = 0
+            greek_delta = 0
         info_dict = {
             "option_symbol": call['symbol'],
             "symbol": call['underlying'],
