@@ -331,7 +331,7 @@ for symbol in symbols_list[:cutoff]:
         "progress_pct": int((nbr + 1) / min(cutoff,len(symbols_list)) * 100 - 100),
     }
     if nbr == 0:
-        json_count["symbols_length"] = min(cutoff,len(symbols_list))
+        json_count["symbols_length"] = len(symbols_list)
     db.child(db_name).child("info").update(json_count)
 
 # Display results
@@ -361,12 +361,12 @@ if watchlist_up == []:
     }]
 db.child(db_name).child("down_list").set(watchlist_down)
 db.child(db_name).child("up_list").set(watchlist_up)
-local_timezone = local_timezone = pytz.timezone('US/Eastern')
+local_timezone = local_timezone = pytz.timezone('US/Pacific')
 now = dt.datetime.now()
 db_time = now.astimezone(local_timezone).strftime("%c")
 json_info = {
     "time": db_time,
-    "counter": len(symbols_list) - 1,
+    "counter": min(cutoff,len(symbols_list)) - 1,
     "length_up": len(watchlist_up),
     "length_down": len(watchlist_down)
 }

@@ -608,35 +608,71 @@
           // Do nothing
         };
       };
+      GetScriptStatus();
     };
 
-    function monitorUpdate() {
-      let progressBarContainer = document.querySelector('.progress-bar__container');
-      let progressBar = document.querySelector('.progress-bar');
-      let progressBarText = document.querySelector('.progress-bar__text');
-      let progressHeader = document.getElementById("progress_header");
-      ConnectFire()
-      firebase.database().ref("scanner/info").on("value", function(snapshot) {
-        let counter = snapshot.val().counter
-        let cutoff = snapshot.val().cutoff
-        let symbols_length = snapshot.val().symbols_length
-        let progress_pct = snapshot.val().progress_pct
-        progressBar.style.left = `${progress_pct}%`
-        let oldText = progressHeader.innerHTML.split('%)')[0] + "%)"
-        let newText = `Symbols ${counter + 1} / ${Math.min(cutoff,symbols_length)} (${progress_pct + 100} %)`
-        if (oldText != newText) {
-          progressHeader.innerHTML = newText + progressHeader.innerHTML.split('%)')[1]
-        }
-        if (counter + 1 == symbols_length) {
-          progressBarText.style.display = "contents"
-        } else {
-          progressBarText.style.display = "none"
-        }
-      })
-      setTimeout(monitorUpdate, 2000)
+    function sleep(sleepDuration) {
+      var now = new Date().getTime();
+      while (new Date().getTime() < now + sleepDuration) { /* Do nothing */ }
     }
 
-    monitorUpdate()
+    function GetScriptStatus() {
+      sleep(1000)
+      let dyno_url = `https://api.heroku.com/apps/${heroku_name}/dynos`
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", dyno_url);
+      xhr.setRequestHeader("Accept", "application/vnd.heroku+json; version=3");
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.setRequestHeader("Authorization", `Bearer ${heroku_api}`);
+      xhr.send()
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          let response = xhr.responseText
+          let json_response = JSON.parse(response)
+          let dynoList = []
+          json_response.forEach(dyno => {
+            if (dyno['command'] === `python ${script_name}.py`) {
+              dynoList.push(dyno);
+            }
+          });
+          if (dynoList.length >= 1) {
+            updateProgress(true)
+          } else {
+            updateProgress(false)
+          }
+        }
+      };
+    };
+
+    function updateProgress(scanning) {
+      if (scanning) {
+        let progressBarContainer = document.querySelector('.progress-bar__container');
+        let progressBar = document.querySelector('.progress-bar');
+        let progressBarText = document.querySelector('.progress-bar__text');
+        let progressHeader = document.getElementById("progress_header");
+        ConnectFire()
+        firebase.database().ref("scanner/info").on("value", function(snapshot) {
+          let counter = snapshot.val().counter
+          let cutoff = snapshot.val().cutoff
+          let symbols_length = snapshot.val().symbols_length
+          let progress_pct = snapshot.val().progress_pct
+          progressBar.style.left = `${progress_pct}%`
+          let oldText = progressHeader.innerHTML.split('%)')[0] + "%)"
+          let newText = `Symbols ${counter + 1} / ${Math.min(cutoff,symbols_length)} (${progress_pct + 100} %)`
+          if (oldText != newText) {
+            progressHeader.innerHTML = newText + progressHeader.innerHTML.split('%)')[1]
+          }
+          if (counter + 1 == Math.min(cutoff,symbols_length)) {
+            progressBarText.style.display = "contents"
+          } else {
+            progressBarText.style.display = "none"
+          }
+        })
+        GetScriptStatus()
+      } else {
+        console.log("Scan finished")
+      }
+    }
 
     </script>
 </body>
