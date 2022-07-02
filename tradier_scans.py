@@ -214,12 +214,15 @@ def find_call(symbol):
     if 'option' in chain:
         chain = chain['option']
     calls = [option for option in chain if option['option_type'] == 'call' and option['open_interest'] > min_oi]
-    call_deltas = [call['greeks']['delta'] if call['greeks'] != None else 0 for call in calls]
-    desired_delta = delta / 100
-    delta_diffs = list(abs(np.array(call_deltas) - desired_delta))
-    min_diff = min(delta_diffs)
-    min_idx = delta_diffs.index(min_diff)
-    desired_call = calls[min_idx]
+    if calls != []:
+        call_deltas = [call['greeks']['delta'] if call['greeks'] != None else 0 for call in calls]
+        desired_delta = delta / 100
+        delta_diffs = list(abs(np.array(call_deltas) - desired_delta))
+        min_diff = min(delta_diffs)
+        min_idx = delta_diffs.index(min_diff)
+        desired_call = calls[min_idx]
+    else:
+        desired_call = False
     return desired_call
 
 # Use TA library to create ThinkScript functions
@@ -270,16 +273,27 @@ for symbol in symbols_list[:cutoff]:
     or (C4DN and MOBDN and C14DN and C14CHGDN):
         quote = get_quote(symbol)
         call = find_call(symbol)
-        info_dict = {
-            "option_symbol": call['symbol'],
-            "symbol": call['underlying'],
-            "strike": call['strike'],
-            "expiration": call['expiration_date'],
-            "last": quote['last'],
-            "delta": round(float(call['greeks']['delta']),3)
-        }
-        watchlist_down.append(info_dict)
-        print(f"{symbol} added to down watchlist")
+        if call:
+            if 'greeks' in call:
+                if call['greeks'] != None:
+                    if 'delta' in call['greeks']:
+                        greek_delta = call['greeks']['delta']
+                    else:
+                        greek_delta = 0
+                else:
+                    greek_delta = 0
+            else:
+                greek_delta = 0
+            info_dict = {
+                "option_symbol": call['symbol'],
+                "symbol": call['underlying'],
+                "strike": call['strike'],
+                "expiration": call['expiration_date'],
+                "last": quote['last'],
+                "delta": round(float(call['greeks']['delta']),3)
+            }
+            watchlist_down.append(info_dict)
+            print(f"{symbol} added to down watchlist")
     C4UP = CCI4.values[-2] < CCI4.values[-1]
     MOBUP = Main.values[-2] < Main.values[-1]
     C14UP =  CCI14.values[-2] < CCI14.values[-1]
@@ -291,32 +305,33 @@ for symbol in symbols_list[:cutoff]:
     or (C4UP and MOBUP and C14UP and C14CHG):
         quote = get_quote(symbol)
         call = find_call(symbol)
-        if 'greeks' in call:
-            if call['greeks'] != None:
-                if 'delta' in call['greeks']:
-                    greek_delta = call['greeks']['delta']
+        if call:
+            if 'greeks' in call:
+                if call['greeks'] != None:
+                    if 'delta' in call['greeks']:
+                        greek_delta = call['greeks']['delta']
+                    else:
+                        greek_delta = 0
                 else:
                     greek_delta = 0
             else:
                 greek_delta = 0
-        else:
-            greek_delta = 0
-        info_dict = {
-            "option_symbol": call['symbol'],
-            "symbol": call['underlying'],
-            "strike": call['strike'],
-            "expiration": call['expiration_date'],
-            "last": quote['last'],
-            "delta": round(float(delta),3)
-        }
-        watchlist_up.append(info_dict)
-        print(f"{symbol} added to up watchlist")
+            info_dict = {
+                "option_symbol": call['symbol'],
+                "symbol": call['underlying'],
+                "strike": call['strike'],
+                "expiration": call['expiration_date'],
+                "last": quote['last'],
+                "delta": round(float(delta),3)
+            }
+            watchlist_up.append(info_dict)
+            print(f"{symbol} added to up watchlist")
     json_count = {
         "counter": nbr,
-        "progress_pct": int((nbr + 1) / len(symbols_list) * 100 - 100),
+        "progress_pct": int((nbr + 1) / min(cutoff,len(symbols_list)) * 100 - 100),
     }
     if nbr == 0:
-        json_count["symbols_length"] = len(symbols_list)
+        json_count["symbols_length"] = min(cutoff,len(symbols_list))
     db.child(db_name).child("info").update(json_count)
 
 # Display results

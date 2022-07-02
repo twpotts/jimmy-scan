@@ -618,11 +618,12 @@
       ConnectFire()
       firebase.database().ref("scanner/info").on("value", function(snapshot) {
         let counter = snapshot.val().counter
+        let cutoff = snapshot.val().cutoff
         let symbols_length = snapshot.val().symbols_length
         let progress_pct = snapshot.val().progress_pct
         progressBar.style.left = `${progress_pct}%`
         let oldText = progressHeader.innerHTML.split('%)')[0] + "%)"
-        let newText = `Symbols ${counter + 1} / ${symbols_length} (${progress_pct + 100} %)`
+        let newText = `Symbols ${counter + 1} / ${Math.min(cutoff,symbols_length)} (${progress_pct + 100} %)`
         if (oldText != newText) {
           progressHeader.innerHTML = newText + progressHeader.innerHTML.split('%)')[1]
         }
