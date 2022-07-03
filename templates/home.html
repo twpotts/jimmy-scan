@@ -76,7 +76,7 @@
           <div class="row" id="row4">
             <div class="col" id="col4">
               <div id="progress_header">
-                Symbols 0 / 500 (0 %)
+                Symbols {{info['counter'] + 1}} / {{info['cutoff']}} ({{info['progress_pct'] + 100}} %)
                 <div class="progress-grid__container">
                   <div class="progress-bar__container">
                     <div class="progress-bar">
@@ -229,7 +229,7 @@
         background-color: #008516;
         top:0;
         bottom: 0;
-        left: -100%;
+        left: {{info['progress_pct']}}%;
         border-radius: inherit;
         display: flex;
         justify-content: center;
