@@ -3,6 +3,66 @@
     {% block all_else %}
     <!-- Navbar end -->
     <br><br>
+    <style>
+      body {
+        background-color: gainsboro;
+      }
+      .scroll {
+        max-height: 500px;
+        overflow: scroll
+      }
+      .scroll thead th {
+        background-color: white;
+        position: sticky;
+        top: 0
+      }
+      .pointer {
+        cursor: pointer;
+      }
+      #progress_header {
+        width: 100%;
+        text-align: left;
+        padding: 5px;
+      }
+      .progress-grid__container {
+        display: flex;
+        justify-content: left;
+        align-items: left;
+        height: 100%;
+        width: 100%;
+        padding: 5px;
+      }
+      .progress-bar__container {
+        width: 70%;
+        height: 2rem;
+        border-radius: 2rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.5s;
+        will-change: transform;
+        box-shadow: 0 0 5px #008516;
+      }
+      .progress-bar {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        content: "";
+        background-color: #008516;
+        top:0;
+        bottom: 0;
+        left: {{info['progress_pct']}}%;
+        border-radius: inherit;
+        display: flex;
+        justify-content: center;
+        align-items:center;
+        color: white;
+        font-family: sans-serif;
+      }
+      .progress-bar__text {
+        display: none;
+      }
+
+    </style>
     <section class="p-5">
       <div class="container">
         <div class="row" id="row1">
@@ -182,66 +242,6 @@
         </div>
       </div>
     </section>
-    <style>
-      body {
-        background-color: gainsboro;
-      }
-      .scroll {
-        max-height: 500px;
-        overflow: scroll
-      }
-      .scroll thead th {
-        background-color: white;
-        position: sticky;
-        top: 0
-      }
-      .pointer {
-        cursor: pointer;
-      }
-      #progress_header {
-        width: 100%;
-        text-align: left;
-        padding: 5px;
-      }
-      .progress-grid__container {
-        display: flex;
-        justify-content: left;
-        align-items: left;
-        height: 100%;
-        width: 100%;
-        padding: 5px;
-      }
-      .progress-bar__container {
-        width: 70%;
-        height: 2rem;
-        border-radius: 2rem;
-        position: relative;
-        overflow: hidden;
-        transition: all 0.5s;
-        will-change: transform;
-        box-shadow: 0 0 5px #008516;
-      }
-      .progress-bar {
-        position: absolute;
-        height: 100%;
-        width: 100%;
-        content: "";
-        background-color: #008516;
-        top:0;
-        bottom: 0;
-        left: {{info['progress_pct']}}%;
-        border-radius: inherit;
-        display: flex;
-        justify-content: center;
-        align-items:center;
-        color: white;
-        font-family: sans-serif;
-      }
-      .progress-bar__text {
-        display: none;
-      }
-
-    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
