@@ -168,10 +168,14 @@ def get_historical_data(symbol):
                     data = data[:-1]
             else:
                 print(data)
+                return False
         else:
             print(data)
+            return False
     else:
         data = data_request.content
+        print(data)
+        return False
     return data
 
 # Define function to get quote
@@ -183,7 +187,8 @@ def get_quote(symbol):
     quote_request = requests.get(quote_url, headers = auth['tradier_headers'])
     if quote_request.status_code != 200:
         quote = quote_request.content
-        print("Error: Could not get quotes")
+        print(quote)
+        return False
     else:
         quote = json.loads(quote_request.content)
         if 'quotes' in quote:
@@ -255,92 +260,97 @@ for symbol in symbols_list[:cutoff]:
     if '-' in symbol:
         symbol = symbol.replace('-','/')
     data = get_historical_data(symbol)
-    o = [bar['open'] for bar in data]
-    h = [bar['high'] for bar in data]
-    l = [bar['low'] for bar in data]
-    c = [bar['close'] for bar in data]
-    df = pd.DataFrame()
-    df['o'] = o
-    df['h'] = h
-    df['l'] = l
-    df['c'] = c
-    EMA = ExpAverage(df['c'], calcLength)
-    Main = ExpAverage(EMA, smoothLength)
-    CCI4 = ta.trend.cci(df['h'], df['l'], df['c'], 4)
-    MOBDN = Main.values[-2] > Main.values[-1]
-    CCI14 = ta.trend.cci(df['h'], df['l'], df['c'], 14)
-    C4DN = CCI4.values[-2] > CCI4.values[-1]
-    C14DN = CCI14.values[-2] > CCI14.values[-1]
-    C4CHGDN = CCI4.values[-2] > CCI4.values[-3]
-    MOBCHGDN = Main.values[-2] > Main.values[-3]
-    C14CHGDN = CCI14.values[-2] > CCI14.values[-3]
-    if (C4DN and MOBDN and C14DN and C4CHGDN) \
-    or (C4DN and MOBDN and C14DN and  MOBCHGDN) \
-    or (C4DN and MOBDN and C14DN and C14CHGDN):
-        quote = get_quote(symbol)
-        call = find_call(symbol)
-        if call:
-            if 'greeks' in call:
-                if call['greeks'] != None:
-                    if 'delta' in call['greeks']:
-                        greek_delta = call['greeks']['delta']
+    if data:
+        o = [bar['open'] for bar in data if type(bar) != int]
+        h = [bar['high'] for bar in data if type(bar) != int]
+        l = [bar['low'] for bar in data if type(bar) != int]
+        c = [bar['close'] for bar in data if type(bar) != int]
+        df = pd.DataFrame()
+        df['o'] = o
+        df['h'] = h
+        df['l'] = l
+        df['c'] = c
+        EMA = ExpAverage(df['c'], calcLength)
+        Main = ExpAverage(EMA, smoothLength)
+        CCI4 = ta.trend.cci(df['h'], df['l'], df['c'], 4)
+        MOBDN = Main.values[-2] > Main.values[-1]
+        CCI14 = ta.trend.cci(df['h'], df['l'], df['c'], 14)
+        C4DN = CCI4.values[-2] > CCI4.values[-1]
+        C14DN = CCI14.values[-2] > CCI14.values[-1]
+        C4CHGDN = CCI4.values[-2] > CCI4.values[-3]
+        MOBCHGDN = Main.values[-2] > Main.values[-3]
+        C14CHGDN = CCI14.values[-2] > CCI14.values[-3]
+        if (C4DN and MOBDN and C14DN and C4CHGDN) \
+        or (C4DN and MOBDN and C14DN and  MOBCHGDN) \
+        or (C4DN and MOBDN and C14DN and C14CHGDN):
+            quote = get_quote(symbol)
+            call = find_call(symbol)
+            info_dict = {}
+            if call:
+                if 'greeks' in call:
+                    if call['greeks'] != None:
+                        if 'delta' in call['greeks']:
+                            greek_delta = call['greeks']['delta']
+                        else:
+                            greek_delta = 0
                     else:
                         greek_delta = 0
                 else:
                     greek_delta = 0
-            else:
-                greek_delta = 0
-            info_dict = {
-                "option_symbol": call['symbol'],
-                "symbol": call['underlying'],
-                "strike": call['strike'],
-                "expiration": call['expiration_date'],
-                "last": quote['last'],
-                "delta": round(float(greek_delta),3),
-                "open_interest": call['open_interest']
-            }
-            watchlist_down.append(info_dict)
-            print(f"{symbol} added to down watchlist")
-    C4UP = CCI4.values[-2] < CCI4.values[-1]
-    MOBUP = Main.values[-2] < Main.values[-1]
-    C14UP =  CCI14.values[-2] < CCI14.values[-1]
-    C4CHG =CCI4.values[-2] < CCI4.values[-3]
-    MOBCHG = Main.values[-2] < Main.values[-3]
-    C14CHG = CCI14.values[-2] < CCI14.values[-3]
-    if (C4UP and MOBUP and C14UP and C4CHG) \
-    or (C4UP and MOBUP and C14UP and  MOBCHG) \
-    or (C4UP and MOBUP and C14UP and C14CHG):
-        quote = get_quote(symbol)
-        call = find_call(symbol)
-        if call:
-            if 'greeks' in call:
-                if call['greeks'] != None:
-                    if 'delta' in call['greeks']:
-                        greek_delta = call['greeks']['delta']
+                info_dict = {
+                    "option_symbol": call['symbol'],
+                    "symbol": call['underlying'],
+                    "strike": call['strike'],
+                    "expiration": call['expiration_date'],
+                    "delta": round(float(greek_delta),3),
+                    "open_interest": call['open_interest']
+                }
+                if quote:
+                    info_dict["last"] = quote['last']
+                watchlist_down.append(info_dict)
+                print(f"{symbol} added to down watchlist")
+        C4UP = CCI4.values[-2] < CCI4.values[-1]
+        MOBUP = Main.values[-2] < Main.values[-1]
+        C14UP =  CCI14.values[-2] < CCI14.values[-1]
+        C4CHG =CCI4.values[-2] < CCI4.values[-3]
+        MOBCHG = Main.values[-2] < Main.values[-3]
+        C14CHG = CCI14.values[-2] < CCI14.values[-3]
+        if (C4UP and MOBUP and C14UP and C4CHG) \
+        or (C4UP and MOBUP and C14UP and  MOBCHG) \
+        or (C4UP and MOBUP and C14UP and C14CHG):
+            quote = get_quote(symbol)
+            call = find_call(symbol)
+            info_dict = {}
+            if call:
+                if 'greeks' in call:
+                    if call['greeks'] != None:
+                        if 'delta' in call['greeks']:
+                            greek_delta = call['greeks']['delta']
+                        else:
+                            greek_delta = 0
                     else:
                         greek_delta = 0
                 else:
                     greek_delta = 0
-            else:
-                greek_delta = 0
-            info_dict = {
-                "option_symbol": call['symbol'],
-                "symbol": call['underlying'],
-                "strike": call['strike'],
-                "expiration": call['expiration_date'],
-                "last": quote['last'],
-                "delta": round(float(greek_delta),3),
-                "open_interest": call['open_interest']
-            }
-            watchlist_up.append(info_dict)
-            print(f"{symbol} added to up watchlist")
-    json_count = {
-        "counter": nbr,
-        "progress_pct": int((nbr + 1) / min(cutoff,len(symbols_list)) * 100 - 100),
-    }
-    if nbr == 0:
-        json_count["symbols_length"] = len(symbols_list)
-    db.child(db_name).child("info").update(json_count)
+                info_dict = {
+                    "option_symbol": call['symbol'],
+                    "symbol": call['underlying'],
+                    "strike": call['strike'],
+                    "expiration": call['expiration_date'],
+                    "delta": round(float(greek_delta),3),
+                    "open_interest": call['open_interest']
+                }
+                if quote:
+                    info_dict["last"] = quote['last']
+                watchlist_up.append(info_dict)
+                print(f"{symbol} added to up watchlist")
+        json_count = {
+            "counter": nbr,
+            "progress_pct": int((nbr + 1) / min(cutoff,len(symbols_list)) * 100 - 100),
+        }
+        if nbr == 0:
+            json_count["symbols_length"] = len(symbols_list)
+        db.child(db_name).child("info").update(json_count)
 
 # Display results
 
