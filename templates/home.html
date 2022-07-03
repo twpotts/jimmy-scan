@@ -39,16 +39,24 @@
                             <td id="delta">{{info['delta']}}</td>
                           </tr>
                           <tr>
-                            <th>OI min</th>
+                            <th>Open interest, min</th>
                             <td id="min_oi">{{info['min_oi']}}</td>
                           </tr>
                           <tr>
-                            <th>DTE min</th>
+                            <th>DTE, min</th>
                             <td id="DTE_min">{{info['DTE_min']}}</td>
                           </tr>
                           <tr>
-                            <th>DTE max</th>
+                            <th>DTE, max</th>
                             <td id="DTE_max">{{info['DTE_max']}}</td>
+                          </tr>
+                          <tr>
+                            <th>Time back</th>
+                            <td id="time_back">{{info['time_back']}}</td>
+                          </tr>
+                          <tr>
+                            <th>Interval</th>
+                            <td id="interval">{{info['interval']}}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -62,7 +70,7 @@
           <div class="row" id="row3">
             <div class="col" id="col3">
               <br>
-              <button class="btn btn-dark" onclick="startScript()">Scan Now</button>
+              <button class="btn btn-dark" onclick="GetScriptStatus(click=true)">Scan Now</button>
             </div>
           </div>
           <div class="row" id="row4">
@@ -119,6 +127,7 @@
                               <td> {{ item['strike'] }} </td>
                               <td> {{ item['last'] }} </td> 
                               <td> {{ item['delta'] }} </td> 
+                              <td> {{ item['open_interest'] }} </td> 
                             </tr>
                             {% endfor %}
                           </tbody>
@@ -157,6 +166,7 @@
                             <td> {{ item['strike'] }} </td>
                             <td> {{ item['last'] }} </td> 
                             <td> {{ item['delta'] }} </td>
+                            <td> {{ item['open_interest'] }} </td> 
                           </tr>
                           {% endfor %}
                         </tbody>
@@ -256,6 +266,8 @@
       let min_oi = document.getElementById("min_oi")
       let DTE_min = document.getElementById("DTE_min")
       let DTE_max = document.getElementById("DTE_max")
+      let time_back = document.getElementById("time_back")
+      let interval = document.getElementById("interval")
 
       let input1 = document.createElement("select")
       let input1a = document.createElement("option")
@@ -298,6 +310,31 @@
       DTE_max.parentElement.removeChild(DTE_max)
       input6.id = `DTE_max_input`
 
+      let input7 = document.createElement("input")
+      input7.value = time_back.textContent
+      time_back.parentElement.appendChild(input7)
+      time_back.parentElement.removeChild(time_back)
+      input7.id = `time_back_input`
+
+      let input8 = document.createElement("select")
+      let input8a = document.createElement("option")
+      let input8b = document.createElement("option")
+      let input8c = document.createElement("option")
+      interval_options = ["daily", "weekly", "monthly"]
+      input8a.value = interval_options[0]
+      input8a.textContent = interval_options[0]
+      input8b.value = interval_options[1]
+      input8b.textContent = interval_options[1]
+      input8c.value = interval_options[2]
+      input8c.textContent = interval_options[2]
+      input8.appendChild(input8a)
+      input8.appendChild(input8b)
+      input8.appendChild(input8c)
+      interval.parentElement.appendChild(input8)
+      interval.parentElement.removeChild(interval)
+      input8.id = `interval_input`
+      input8.selectedIndex = interval_options.indexOf(interval.textContent)
+
       let edit_btn = document.getElementById("change_settings")
       let submit_btn = document.createElement("button")
       submit_btn.innerHTML = "Submit Settings"
@@ -315,6 +352,8 @@
         let min_oi_input = document.getElementById(`min_oi_input`)
         let DTE_min_input = document.getElementById(`DTE_min_input`)
         let DTE_max_input = document.getElementById(`DTE_max_input`)
+        let time_back = document.getElementById("time_back")
+        let interval = document.getElementById("interval")
 
         let list_scanned_td = document.createElement("td")
         let cutoff_td = document.createElement("td")
@@ -322,6 +361,8 @@
         let min_oi_td = document.createElement("td")
         let DTE_min_td = document.createElement("td")
         let DTE_max_td = document.createElement("td")
+        let time_back_td = document.createElement("td")
+        let interval_td = document.createElement("td")
 
         list_scanned_td.id = `list_scanned`
         cutoff_td.id = `cutoff`
@@ -329,6 +370,8 @@
         min_oi_td.id = `min_oi`
         DTE_min_td.id = `DTE_min`
         DTE_max_td.id = `DTE_max`
+        time_back_td.id = `time_back`
+        interval_td.id = `interval`
 
         list_scanned_td.textContent = list_scanned_input.value
         cutoff_td.textContent = cutoff_input.value
@@ -336,6 +379,8 @@
         min_oi_td.textContent = min_oi_input.value
         DTE_min_td.textContent = DTE_min_input.value
         DTE_max_td.textContent = DTE_max_input.value
+        time_back_td.textContent = time_back_input.value
+        interval_td.textContent = interval_input.value
 
         list_scanned_input.parentElement.appendChild(list_scanned_td)
         cutoff_input.parentElement.appendChild(cutoff_td)
@@ -343,6 +388,8 @@
         min_oi_input.parentElement.appendChild(min_oi_td)
         DTE_min_input.parentElement.appendChild(DTE_min_td)
         DTE_max_input.parentElement.appendChild(DTE_max_td)
+        time_back_input.parentElement.appendChild(time_back_td)
+        interval_input.parentElement.appendChild(interval_td)
 
         list_scanned_input.parentElement.removeChild(list_scanned_input)
         cutoff_input.parentElement.removeChild(cutoff_input)
@@ -350,6 +397,8 @@
         min_oi_input.parentElement.removeChild(min_oi_input)
         DTE_min_input.parentElement.removeChild(DTE_min_input)
         DTE_max_input.parentElement.removeChild(DTE_max_input)
+        time_back_input.parentElement.removeChild(time_back_input)
+        interval_input.parentElement.removeChild(interval_input)
 
         let edit_btn_new = document.createElement("button")
         edit_btn_new.className = "btn btn-dark"
@@ -368,6 +417,8 @@
           "min_oi": parseInt(min_oi_input.value),
           "DTE_min": parseInt(DTE_min_input.value),
           "DTE_max": parseInt(DTE_max_input.value),
+          "time_back": parseInt(time_back_input.value),
+          "interval": String(interval_input.value)
         }
 
         ConnectFire()
@@ -616,7 +667,7 @@
       while (new Date().getTime() < now + sleepDuration) { /* Do nothing */ }
     }
 
-    function GetScriptStatus() {
+    function GetScriptStatus(click=false) {
       sleep(1000)
       let dyno_url = `https://api.heroku.com/apps/${heroku_name}/dynos`
       var xhr = new XMLHttpRequest();
@@ -635,16 +686,23 @@
               dynoList.push(dyno);
             }
           });
+          console.log(dynoList)
           if (dynoList.length >= 1) {
-            updateProgress(true)
+            console.log("Script running...")
+            updateProgress(scanning=true)
           } else {
-            updateProgress(false)
+            if (click) {
+              startScript()
+              console.log("Starting script")
+            } else {
+              updateProgress(scanning=true, last=true)
+            }
           }
         }
       };
     };
 
-    function updateProgress(scanning) {
+    function updateProgress(scanning=true, last=false) {
       if (scanning) {
         let progressBarContainer = document.querySelector('.progress-bar__container');
         let progressBar = document.querySelector('.progress-bar');
@@ -668,10 +726,12 @@
             progressBarText.style.display = "none"
           }
         })
-        GetScriptStatus()
-      } else {
-        console.log("Scan finished")
-      }
+        if (!last) {
+          GetScriptStatus()
+        } else {
+          console.log("Script finished")
+        }
+      } 
     }
 
     </script>

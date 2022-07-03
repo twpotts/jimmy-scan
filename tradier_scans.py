@@ -145,17 +145,17 @@ DTE_min = int(info['DTE_min'])
 cutoff = int(info['cutoff'])
 delta = int(info['delta'])
 min_oi = int(info['min_oi'])
+time_back = int(info['time_back'])
+interval = str(info['interval']) # daily, weekly, monthly
 
 # Define function to get historical data from Tradier
 
 def get_historical_data(symbol):
-    time_back = 14
     date_format = "%Y-%m-%d"
     end = dt.datetime.now()
     end_str = end.strftime(date_format)
     start = end - dt.timedelta(days=int(time_back*2))
     start_str = start.strftime(date_format)
-    interval = 'daily' # daily, weekly, monthly
     data_url = f"{auth_trad['tradier_base']}markets/history?symbol={symbol}&interval={interval}&start={start_str}&end={end_str}"
     data_request = requests.get(data_url, headers = auth_trad['tradier_headers'])
     if data_request.status_code in [200, 201]:
@@ -197,22 +197,28 @@ def get_quote(symbol):
 def find_call(symbol):
     auth = auth_tradier()
     day_start = dt.datetime.now() + dt.timedelta(days=DTE_min)
+    day_counter = day_start
     day_max = dt.datetime.now() + dt.timedelta(days=DTE_max)
-    chain = None
-    while chain == None:
-        exp = day_start.strftime('%Y-%m-%d')
+    chain = [None]
+    while day_counter <= day_max:
+        exp = day_counter.strftime('%Y-%m-%d')
         chain_url = '{}markets/options/chains?symbol={}&expiration={}&greeks=True'.format(auth['tradier_base'], symbol, exp)
         chain_request = requests.get(chain_url, headers = auth['tradier_headers'])
         if chain_request.status_code != 200:
             chain = chain_request.content
-        else:
-            chain = json.loads(chain_request.content)
-            if 'options' in chain:
-                chain = chain['options']
-            if chain == None:
-                day_start = day_start + dt.timedelta(days=1)
+            return False
+        chain = json.loads(chain_request.content)
+        if 'options' in chain:
+            chain = chain['options']
+            if chain != None:
+                break
+        day_counter = day_counter + dt.timedelta(days=1)
+    if chain == None:
+        return False
     if 'option' in chain:
         chain = chain['option']
+    else:
+        return False
     calls = [option for option in chain if option['option_type'] == 'call' and option['open_interest'] > min_oi]
     if calls != []:
         call_deltas = [call['greeks']['delta'] if call['greeks'] != None else 0 for call in calls]
@@ -222,7 +228,7 @@ def find_call(symbol):
         min_idx = delta_diffs.index(min_diff)
         desired_call = calls[min_idx]
     else:
-        desired_call = False
+        return False
     return desired_call
 
 # Use TA library to create ThinkScript functions
