@@ -116,6 +116,7 @@
                               <th><a href="javascript:SortTable(3,'N','',1);">Strike</a></th>
                               <th><a href="javascript:SortTable(4,'N','',1);">Last</a></th>
                               <th><a href="javascript:SortTable(5,'N','',1);">Delta</a></th>
+                              <th><a href="javascript:SortTable(6,'N','',1);">OI</a></th>
                             </tr>
                           </thead>
                           <tbody>
@@ -155,6 +156,7 @@
                               <th><a href="javascript:SortTable(3,'N','',2);">Strike</a></th>
                               <th><a href="javascript:SortTable(4,'N','',2);">Last</a></th>
                               <th><a href="javascript:SortTable(5,'N','',2);">Delta</a></th>
+                              <th><a href="javascript:SortTable(6,'N','',2);">OI</a></th>
                             </tr>
                           </thead>
                         <tbody>
@@ -733,6 +735,8 @@
         }
       } 
     }
+
+    GetScriptStatus(); // Will check for ongoing progress on page refresh
 
     </script>
 </body>
