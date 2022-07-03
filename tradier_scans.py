@@ -296,7 +296,8 @@ for symbol in symbols_list[:cutoff]:
                 "strike": call['strike'],
                 "expiration": call['expiration_date'],
                 "last": quote['last'],
-                "delta": round(float(call['greeks']['delta']),3)
+                "delta": round(float(call['greeks']['delta']),3),
+                "open_interest": call['open_interest']
             }
             watchlist_down.append(info_dict)
             print(f"{symbol} added to down watchlist")
@@ -328,7 +329,8 @@ for symbol in symbols_list[:cutoff]:
                 "strike": call['strike'],
                 "expiration": call['expiration_date'],
                 "last": quote['last'],
-                "delta": round(float(delta),3)
+                "delta": round(float(delta),3),
+                "open_interest": call['open_interest']
             }
             watchlist_up.append(info_dict)
             print(f"{symbol} added to up watchlist")
