@@ -344,13 +344,13 @@ for symbol in symbols_list[:cutoff]:
                     info_dict["last"] = quote['last']
                 watchlist_up.append(info_dict)
                 print(f"{symbol} added to up watchlist")
-        json_count = {
-            "counter": nbr,
-            "progress_pct": int((nbr + 1) / min(cutoff,len(symbols_list)) * 100 - 100),
-        }
-        if nbr == 0:
-            json_count["symbols_length"] = len(symbols_list)
-        db.child(db_name).child("info").update(json_count)
+    json_count = {
+        "counter": nbr,
+        "progress_pct": int((nbr + 1) / min(cutoff,len(symbols_list)) * 100 - 100),
+    }
+    if nbr == 0:
+        json_count["symbols_length"] = len(symbols_list)
+    db.child(db_name).child("info").update(json_count)
 
 # Display results
 
