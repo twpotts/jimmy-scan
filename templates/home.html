@@ -135,6 +135,7 @@
             <div class="col" id="col3">
               <br>
               <button class="btn btn-dark" onclick="GetScriptStatus(click=true)">Scan Now</button>
+              <button class="btn btn-dark" onclick="KillScript()">Stop Scan</button>
             </div>
           </div>
           <div class="row" id="row4">
@@ -690,6 +691,50 @@
       var now = new Date().getTime();
       while (new Date().getTime() < now + sleepDuration) { /* Do nothing */ }
     }
+
+    function KillScript() {
+      let dyno_url = `https://api.heroku.com/apps/${heroku_name}/dynos`
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", dyno_url);
+      xhr.setRequestHeader("Accept", "application/vnd.heroku+json; version=3");
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.setRequestHeader("Authorization", `Bearer ${heroku_api}`);
+      xhr.send()
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          let response = xhr.responseText
+          let json_response = JSON.parse(response)
+          let dynoList = []
+          json_response.forEach(dyno => {
+            if (dyno['command'] === `python ${script_name}.py`) {
+              dynoList.push(dyno);
+            }
+          });
+          const dyno_id = dynoList[0]['id']
+          let stop_url = `https://api.heroku.com/apps/${heroku_name}/dynos/${dyno_id}/actions/stop`
+          xhr.open("POST", stop_url);
+          xhr.setRequestHeader("Accept", "application/vnd.heroku+json; version=3");
+          xhr.setRequestHeader("Content-Type", "application/json");
+          xhr.setRequestHeader("Authorization", `Bearer ${heroku_api}`);
+          xhr.send()
+          xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+              // console.log(xhr.status);
+              };
+            };
+          }
+        };
+      sleep(7000)
+      let progressBar = document.querySelector('.progress-bar')
+      progressBar.style.left = "-100%"
+      let json_kill = {
+        "counter": -1,
+        "progress_pct": -100
+      }
+      ConnectFire()
+      firebase.database().ref(`scanner/info`).update(json_kill)
+      console.log("Scan stopped")
+    };
 
     function GetScriptStatus(click=false) {
       sleep(1000)
