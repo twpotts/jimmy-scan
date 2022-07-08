@@ -301,8 +301,8 @@ for symbol in symbols_list[:cutoff]:
         or (C4DN and MOBDN and C14DN and  MOBCHGDN) \
         or (C4DN and MOBDN and C14DN and C14CHGDN):
             info_dict = {}
+            info_dict["symbol"] = symbol
             if end_date == "":
-                quote = get_quote(symbol)
                 call = find_call(symbol)
                 if call:
                     if 'greeks' in call:
@@ -315,23 +315,18 @@ for symbol in symbols_list[:cutoff]:
                             greek_delta = 0
                     else:
                         greek_delta = 0
-                    info_dict = {
-                        "option_symbol": call['symbol'],
-                        "symbol": call['underlying'],
-                        "strike": call['strike'],
-                        "expiration": call['expiration_date'],
-                        "delta": round(float(greek_delta),3),
-                        "open_interest": call['open_interest']
-                    }
-                    if quote:
-                        info_dict["last"] = quote['last']
-                    watchlist_down.append(info_dict)
-                    print(f"{symbol} added to down watchlist")
+                    info_dict["option_symbol"] = call['symbol']
+                    info_dict["strike"] = call['strike']
+                    info_dict["expiration"] = call['expiration_date']
+                    info_dict["delta"] = round(float(greek_delta),3)
+                    info_dict["open_interest"] = call['open_interest']
+                quote = get_quote(symbol)
+                if quote:
+                    info_dict["last"] = quote['last']
             else:
-                info_dict["symbol"] = symbol
                 info_dict["last"] = data[-1]['close']
-                watchlist_down.append(info_dict)
-                print(f"{symbol} added to down watchlist")
+            watchlist_down.append(info_dict)
+            print(f"{symbol} added to down watchlist")
         C4UP = CCI4.values[-2] < CCI4.values[-1]
         MOBUP = Main.values[-2] < Main.values[-1]
         C14UP =  CCI14.values[-2] < CCI14.values[-1]
@@ -342,8 +337,8 @@ for symbol in symbols_list[:cutoff]:
         or (C4UP and MOBUP and C14UP and  MOBCHG) \
         or (C4UP and MOBUP and C14UP and C14CHG):
             info_dict = {}
+            info_dict["symbol"] = symbol
             if end_date == "":
-                quote = get_quote(symbol)
                 call = find_call(symbol)
                 if call:
                     if 'greeks' in call:
@@ -356,23 +351,18 @@ for symbol in symbols_list[:cutoff]:
                             greek_delta = 0
                     else:
                         greek_delta = 0
-                    info_dict = {
-                        "option_symbol": call['symbol'],
-                        "symbol": call['underlying'],
-                        "strike": call['strike'],
-                        "expiration": call['expiration_date'],
-                        "delta": round(float(greek_delta),3),
-                        "open_interest": call['open_interest']
-                    }
-                    if quote:
-                        info_dict["last"] = quote['last']
-                    watchlist_up.append(info_dict)
-                    print(f"{symbol} added to up watchlist")
+                    info_dict["option_symbol"] = call['symbol']
+                    info_dict["strike"] = call['strike']
+                    info_dict["expiration"] = call['expiration_date']
+                    info_dict["delta"] = round(float(greek_delta),3)
+                    info_dict["open_interest"] = call['open_interest']
+                quote = get_quote(symbol)
+                if quote:
+                    info_dict["last"] = quote['last']
             else:
-                info_dict["symbol"] = symbol
                 info_dict["last"] = data[-1]['close']
-                watchlist_up.append(info_dict)
-                print(f"{symbol} added to up watchlist")
+            watchlist_up.append(info_dict)
+            print(f"{symbol} added to up watchlist")
     json_count = {
         "counter": nbr,
         "progress_pct": int((nbr + 1) / min(cutoff,len(symbols_list)) * 100 - 100),
