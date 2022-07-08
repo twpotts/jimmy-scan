@@ -238,6 +238,7 @@ def find_call(symbol):
     calls = []
     for call in calls0:
         if call['greeks'] == None:
+            call['greeks'] = {}
             call['greeks']['delta'] = 0
         if call['open_interest'] > min_oi \
         and call['greeks']['delta'] > round(delta / 100 * (5/6),2):
