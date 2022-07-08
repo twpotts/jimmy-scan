@@ -291,7 +291,7 @@ for symbol in symbols_list[:cutoff]:
         or (C4DN and MOBDN and C14DN and  MOBCHGDN) \
         or (C4DN and MOBDN and C14DN and C14CHGDN):
             info_dict = {}
-            if end_date != "":
+            if end_date == "":
                 quote = get_quote(symbol)
                 call = find_call(symbol)
                 if call:
@@ -332,7 +332,7 @@ for symbol in symbols_list[:cutoff]:
         or (C4UP and MOBUP and C14UP and  MOBCHG) \
         or (C4UP and MOBUP and C14UP and C14CHG):
             info_dict = {}
-            if end_date != "":
+            if end_date == "":
                 quote = get_quote(symbol)
                 call = find_call(symbol)
                 if call:
