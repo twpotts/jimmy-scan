@@ -234,9 +234,16 @@ def find_call(symbol):
         chain = chain['option']
     else:
         return False
-    calls = [option for option in chain if option['option_type'] == 'call' and option['open_interest'] > min_oi]
+    calls0 = [option for option in chain if option['option_type'] == 'call']
+    calls = []
+    for call in calls0:
+        if call['greeks'] == None:
+            call['greeks']['delta'] = 0
+        if call['open_interest'] > min_oi \
+        and call['greeks']['delta'] > round(delta / 100 * (5/6),2):
+            calls.append(call)
     if calls != []:
-        call_deltas = [call['greeks']['delta'] if call['greeks'] != None else 0 for call in calls]
+        call_deltas = [call['greeks']['delta'] for call in calls]
         desired_delta = delta / 100
         delta_diffs = list(abs(np.array(call_deltas) - desired_delta))
         min_diff = min(delta_diffs)
