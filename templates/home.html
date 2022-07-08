@@ -118,6 +118,10 @@
                             <th>Interval</th>
                             <td id="interval">{{info['interval']}}</td>
                           </tr>
+                          <tr>
+                            <th>End Date</th>
+                            <td id="end_date">{{info['end_date']}}</td>
+                          </tr>
                         </tbody>
                       </table>
                       <button id="change_settings" class="btn btn-dark" type="button" onclick="editSettings()">Edit Settings</button>
@@ -270,6 +274,7 @@
       let DTE_max = document.getElementById("DTE_max")
       let time_back = document.getElementById("time_back")
       let interval = document.getElementById("interval")
+      let end_date = document.getElementById("end_date")
 
       let input1 = document.createElement("select")
       let input1a = document.createElement("option")
@@ -337,6 +342,14 @@
       input8.id = `interval_input`
       input8.selectedIndex = interval_options.indexOf(interval.textContent)
 
+      let input9 = document.createElement("input")
+      input9.type = "date"
+      //input9.value = end_date.textContent
+      input9.value = new Date()
+      end_date.parentElement.appendChild(input9)
+      end_date.parentElement.removeChild(end_date)
+      input9.id = "end_date"
+
       let edit_btn = document.getElementById("change_settings")
       let submit_btn = document.createElement("button")
       submit_btn.innerHTML = "Submit Settings"
@@ -356,6 +369,7 @@
         let DTE_max_input = document.getElementById(`DTE_max_input`)
         let time_back_input = document.getElementById("time_back_input")
         let interval_input = document.getElementById("interval_input")
+        let end_date_input = document.getElementById("end_date")
 
         let list_scanned_td = document.createElement("td")
         let cutoff_td = document.createElement("td")
@@ -365,6 +379,7 @@
         let DTE_max_td = document.createElement("td")
         let time_back_td = document.createElement("td")
         let interval_td = document.createElement("td")
+        let end_date_td = document.createElement("td")
 
         list_scanned_td.id = `list_scanned`
         cutoff_td.id = `cutoff`
@@ -374,6 +389,7 @@
         DTE_max_td.id = `DTE_max`
         time_back_td.id = `time_back`
         interval_td.id = `interval`
+        end_date_td.id = "end_date"
 
         list_scanned_td.textContent = list_scanned_input.value
         cutoff_td.textContent = cutoff_input.value
@@ -383,6 +399,7 @@
         DTE_max_td.textContent = DTE_max_input.value
         time_back_td.textContent = time_back_input.value
         interval_td.textContent = interval_input.value
+        end_date_td.textContent = end_date_input.value
 
         list_scanned_input.parentElement.appendChild(list_scanned_td)
         cutoff_input.parentElement.appendChild(cutoff_td)
@@ -392,6 +409,7 @@
         DTE_max_input.parentElement.appendChild(DTE_max_td)
         time_back_input.parentElement.appendChild(time_back_td)
         interval_input.parentElement.appendChild(interval_td)
+        end_date_input.parentElement.appendChild(end_date_td)
 
         list_scanned_input.parentElement.removeChild(list_scanned_input)
         cutoff_input.parentElement.removeChild(cutoff_input)
@@ -401,6 +419,7 @@
         DTE_max_input.parentElement.removeChild(DTE_max_input)
         time_back_input.parentElement.removeChild(time_back_input)
         interval_input.parentElement.removeChild(interval_input)
+        end_date_input.parentElement.removeChild(end_date_input)
 
         let edit_btn_new = document.createElement("button")
         edit_btn_new.className = "btn btn-dark"
@@ -420,7 +439,8 @@
           "DTE_min": parseInt(DTE_min_input.value),
           "DTE_max": parseInt(DTE_max_input.value),
           "time_back": parseInt(time_back_input.value),
-          "interval": String(interval_input.value)
+          "interval": String(interval_input.value),
+          "end_date": String(end_date_input.value)
         }
 
         ConnectFire()
@@ -607,9 +627,10 @@
         const csvOutput = exporter.convertToCSV();
         const csvBlob = new Blob([csvOutput], { type: "text/csv" });
         const blobUrl = URL.createObjectURL(csvBlob);
+        let end_date = document.getElementById("end_date").textContent;
         const anchorElement = document.createElement("a");
         anchorElement.href = blobUrl;
-        anchorElement.download = "up_list.csv";
+        anchorElement.download = `up_list${end_date}.csv`;
         anchorElement.click();
         setTimeout(() => {
             URL.revokeObjectURL(blobUrl);
@@ -632,9 +653,10 @@
         const csvOutput = exporter.convertToCSV();
         const csvBlob = new Blob([csvOutput], { type: "text/csv" });
         const blobUrl = URL.createObjectURL(csvBlob);
+        let end_date = document.getElementById("end_date").textContent;
         const anchorElement = document.createElement("a");
         anchorElement.href = blobUrl;
-        anchorElement.download = "down_list.csv";
+        anchorElement.download = `down_list${end_date}.csv`;
         anchorElement.click();
         setTimeout(() => {
             URL.revokeObjectURL(blobUrl);

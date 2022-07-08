@@ -147,13 +147,20 @@ delta = int(info['delta'])
 min_oi = int(info['min_oi'])
 time_back = int(info['time_back'])
 interval = str(info['interval']) # daily, weekly, monthly
+end_date = str(info['end_date'])
+if end_date != "":
+    print(f"Using {end_date} as end date")
 
 # Define function to get historical data from Tradier
 
 def get_historical_data(symbol):
     date_format = "%Y-%m-%d"
-    end = dt.datetime.now()
-    end_str = end.strftime(date_format)
+    if end_date == "":
+        end = dt.datetime.now()
+        end_str = end.strftime(date_format)
+    else:
+        end_str = end_date
+        end = pd.to_datetime(end_date)
     start = end - dt.timedelta(days=int(time_back*2))
     start_str = start.strftime(date_format)
     data_url = f"{auth_trad['tradier_base']}markets/history?symbol={symbol}&interval={interval}&start={start_str}&end={end_str}"
@@ -283,30 +290,36 @@ for symbol in symbols_list[:cutoff]:
         if (C4DN and MOBDN and C14DN and C4CHGDN) \
         or (C4DN and MOBDN and C14DN and  MOBCHGDN) \
         or (C4DN and MOBDN and C14DN and C14CHGDN):
-            quote = get_quote(symbol)
-            call = find_call(symbol)
             info_dict = {}
-            if call:
-                if 'greeks' in call:
-                    if call['greeks'] != None:
-                        if 'delta' in call['greeks']:
-                            greek_delta = call['greeks']['delta']
+            if end_date != "":
+                quote = get_quote(symbol)
+                call = find_call(symbol)
+                if call:
+                    if 'greeks' in call:
+                        if call['greeks'] != None:
+                            if 'delta' in call['greeks']:
+                                greek_delta = call['greeks']['delta']
+                            else:
+                                greek_delta = 0
                         else:
                             greek_delta = 0
                     else:
                         greek_delta = 0
-                else:
-                    greek_delta = 0
-                info_dict = {
-                    "option_symbol": call['symbol'],
-                    "symbol": call['underlying'],
-                    "strike": call['strike'],
-                    "expiration": call['expiration_date'],
-                    "delta": round(float(greek_delta),3),
-                    "open_interest": call['open_interest']
-                }
-                if quote:
-                    info_dict["last"] = quote['last']
+                    info_dict = {
+                        "option_symbol": call['symbol'],
+                        "symbol": call['underlying'],
+                        "strike": call['strike'],
+                        "expiration": call['expiration_date'],
+                        "delta": round(float(greek_delta),3),
+                        "open_interest": call['open_interest']
+                    }
+                    if quote:
+                        info_dict["last"] = quote['last']
+                    watchlist_down.append(info_dict)
+                    print(f"{symbol} added to down watchlist")
+            else:
+                info_dict["symbol"] = symbol
+                info_dict["last"] = data[-1]['close']
                 watchlist_down.append(info_dict)
                 print(f"{symbol} added to down watchlist")
         C4UP = CCI4.values[-2] < CCI4.values[-1]
@@ -318,30 +331,36 @@ for symbol in symbols_list[:cutoff]:
         if (C4UP and MOBUP and C14UP and C4CHG) \
         or (C4UP and MOBUP and C14UP and  MOBCHG) \
         or (C4UP and MOBUP and C14UP and C14CHG):
-            quote = get_quote(symbol)
-            call = find_call(symbol)
             info_dict = {}
-            if call:
-                if 'greeks' in call:
-                    if call['greeks'] != None:
-                        if 'delta' in call['greeks']:
-                            greek_delta = call['greeks']['delta']
+            if end_date != "":
+                quote = get_quote(symbol)
+                call = find_call(symbol)
+                if call:
+                    if 'greeks' in call:
+                        if call['greeks'] != None:
+                            if 'delta' in call['greeks']:
+                                greek_delta = call['greeks']['delta']
+                            else:
+                                greek_delta = 0
                         else:
                             greek_delta = 0
                     else:
                         greek_delta = 0
-                else:
-                    greek_delta = 0
-                info_dict = {
-                    "option_symbol": call['symbol'],
-                    "symbol": call['underlying'],
-                    "strike": call['strike'],
-                    "expiration": call['expiration_date'],
-                    "delta": round(float(greek_delta),3),
-                    "open_interest": call['open_interest']
-                }
-                if quote:
-                    info_dict["last"] = quote['last']
+                    info_dict = {
+                        "option_symbol": call['symbol'],
+                        "symbol": call['underlying'],
+                        "strike": call['strike'],
+                        "expiration": call['expiration_date'],
+                        "delta": round(float(greek_delta),3),
+                        "open_interest": call['open_interest']
+                    }
+                    if quote:
+                        info_dict["last"] = quote['last']
+                    watchlist_up.append(info_dict)
+                    print(f"{symbol} added to up watchlist")
+            else:
+                info_dict["symbol"] = symbol
+                info_dict["last"] = data[-1]['close']
                 watchlist_up.append(info_dict)
                 print(f"{symbol} added to up watchlist")
     json_count = {
