@@ -148,6 +148,9 @@ min_oi = int(info['min_oi'])
 time_back = int(info['time_back'])
 interval = str(info['interval']) # daily, weekly, monthly
 end_date = str(info['end_date'])
+if end_date == dt.datetime.now().strftime("%Y-%m-%d") \
+or pd.to_datetime(end_date) > dt.datetime.now():
+    end_date = ""
 if end_date != "":
     print(f"Using {end_date} as end date")
 
