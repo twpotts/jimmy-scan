@@ -172,10 +172,14 @@ def get_historical_data(symbol):
         data = json.loads(data_request.content)
         if 'history' in data:
             data = data['history']
-            if 'day' in data:
-                data = data['day']
-                if data[-1]['close'] == 'NaN':
-                    data = data[:-1]
+            if data != None:
+                if 'day' in data:
+                    data = data['day']
+                    if data[-1]['close'] == 'NaN':
+                        data = data[:-1]
+                else:
+                    print(data)
+                    return False
             else:
                 print(data)
                 return False
