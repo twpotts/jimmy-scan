@@ -188,7 +188,7 @@
                           <tbody>
                             {% for item in up_list %}
                             <tr style="display: table-row">
-                              <td> {{ "info['end_date']" | replace("-","") }} </td>
+                              <td> {{ info['end_date'] | replace("-","") }} </td>
                               <td> {{ item['option_symbol'] }} </td>
                               <td> {{ item['symbol'] }} </td>
                               <td> {{ item['expiration'] }} </td>
@@ -230,7 +230,7 @@
                         <tbody>
                           {% for item in down_list %}
                           <tr style="display: table-row">
-                            <td> {{ "info['end_date']" | replace("-","") }} </td>
+                            <td> {{ info['end_date'] | replace("-","") }} </td>
                             <td> {{ item['option_symbol'] }} </td>
                             <td> {{ item['symbol'] }} </td>
                             <td> {{ item['expiration'] }} </td>
