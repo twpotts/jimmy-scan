@@ -188,7 +188,7 @@
                           <tbody>
                             {% for item in up_list %}
                             <tr style="display: table-row">
-                              <td> {{ info['end_date'] }} </td>
+                              <td> {{ "info['end_date']" | replace("-","") }} </td>
                               <td> {{ item['option_symbol'] }} </td>
                               <td> {{ item['symbol'] }} </td>
                               <td> {{ item['expiration'] }} </td>
@@ -217,18 +217,20 @@
                         <table class="table" id="index_table2">
                           <thead>
                             <tr>
-                              <th><a href="javascript:SortTable(0,'T','',2);">Option Symbol</a></th>
-                              <th><a href="javascript:SortTable(1,'T','',2);">Symbol</a></th>
-                              <th><a href="javascript:SortTable(2,'D','mdy',2);">Expiration</a></th>
-                              <th><a href="javascript:SortTable(3,'N','',2);">Strike</a></th>
-                              <th><a href="javascript:SortTable(4,'N','',2);">Last</a></th>
-                              <th><a href="javascript:SortTable(5,'N','',2);">Delta</a></th>
-                              <th><a href="javascript:SortTable(6,'N','',2);">OI</a></th>
+                              <th><a href="javascript:SortTable(0,'D','mdy',2);">End Date</a></th>
+                              <th><a href="javascript:SortTable(1,'T','',2);">Option Symbol</a></th>
+                              <th><a href="javascript:SortTable(2,'T','',2);">Symbol</a></th>
+                              <th><a href="javascript:SortTable(3,'D','mdy',2);">Expiration</a></th>
+                              <th><a href="javascript:SortTable(4,'N','',2);">Strike</a></th>
+                              <th><a href="javascript:SortTable(5,'N','',2);">Last</a></th>
+                              <th><a href="javascript:SortTable(6,'N','',2);">Delta</a></th>
+                              <th><a href="javascript:SortTable(7,'N','',2);">OI</a></th>
                             </tr>
                           </thead>
                         <tbody>
                           {% for item in down_list %}
                           <tr style="display: table-row">
+                            <td> {{ "info['end_date']" | replace("-","") }} </td>
                             <td> {{ item['option_symbol'] }} </td>
                             <td> {{ item['symbol'] }} </td>
                             <td> {{ item['expiration'] }} </td>
