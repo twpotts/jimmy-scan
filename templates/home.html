@@ -175,18 +175,20 @@
                         <table class="table" id="index_table1">
                           <thead>
                             <tr>
-                              <th><a href="javascript:SortTable(0,'T','',1);">Option Symbol</a></th>
-                              <th><a href="javascript:SortTable(1,'T','',1);">Symbol</a></th>
-                              <th><a href="javascript:SortTable(2,'D','mdy',1);">Expiration</a></th>
-                              <th><a href="javascript:SortTable(3,'N','',1);">Strike</a></th>
-                              <th><a href="javascript:SortTable(4,'N','',1);">Last</a></th>
-                              <th><a href="javascript:SortTable(5,'N','',1);">Delta</a></th>
-                              <th><a href="javascript:SortTable(6,'N','',1);">OI</a></th>
+                              <th><a href="javascript:SortTable(0,'D','mdy',1);">End Date</a></th>
+                              <th><a href="javascript:SortTable(1,'T','',1);">Option Symbol</a></th>
+                              <th><a href="javascript:SortTable(2,'T','',1);">Symbol</a></th>
+                              <th><a href="javascript:SortTable(3,'D','mdy',1);">Expiration</a></th>
+                              <th><a href="javascript:SortTable(4,'N','',1);">Strike</a></th>
+                              <th><a href="javascript:SortTable(5,'N','',1);">Last</a></th>
+                              <th><a href="javascript:SortTable(6,'N','',1);">Delta</a></th>
+                              <th><a href="javascript:SortTable(7,'N','',1);">OI</a></th>
                             </tr>
                           </thead>
                           <tbody>
                             {% for item in up_list %}
                             <tr style="display: table-row">
+                              <td> {{ info['end_date'] }} </td>
                               <td> {{ item['option_symbol'] }} </td>
                               <td> {{ item['symbol'] }} </td>
                               <td> {{ item['expiration'] }} </td>
@@ -724,7 +726,6 @@
             };
           }
         };
-      sleep(7000)
       let progressBar = document.querySelector('.progress-bar')
       progressBar.style.left = "-100%"
       let json_kill = {
